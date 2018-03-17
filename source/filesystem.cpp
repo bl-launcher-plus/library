@@ -34,6 +34,7 @@ bool Filesystem::load(const std::string & path)
 		next();
 	return true;
 }
+
 void Filesystem::close()
 {
 	FindClose(impl->search.hFind);
@@ -42,9 +43,9 @@ void Filesystem::close()
 
 bool Filesystem::valid()
 {
-	if (impl->search.hFind != INVALID_HANDLE_VALUE)
+	if (impl->search.hFind == INVALID_HANDLE_VALUE)
 		return false;
-	return impl->search.ffd.cFileName[0] != 0;
+	return (impl->search.ffd.cFileName[0] != 0);
 }
 
 void Filesystem::next()
@@ -59,6 +60,7 @@ void Filesystem::next()
 	// Getting here means we are done, or an error occurred
 	impl->search.ffd.cFileName[0] = 0;
 }
+
 
 std::string Filesystem::get()
 {

@@ -46,8 +46,7 @@ bool Engine::init()
 	//	return false;
 	// Load all the libraries for now
 	// TODO: Either make this optional, or make BLauncher 
-	loadLibraries();
-	return true;
+	return loadLibraries();
 }
 bool Engine::destroy()
 {
@@ -278,18 +277,26 @@ bool Engine::loadLibraries()
 	}
 
 	// Iterate all files
+	Printf("BLoader: loading modules.");
+
 	for (; folder.valid(); folder.next())
 	{
 		auto module = folder.get();
 		// We need to make sure it is a dll
 		// TODO: Maybe add some more robust system?
 		auto extp = module.find_last_of(".");
-		if (lowerString(module.substr(extp + 1)) != "dll")
+		if (lowerString(module.substr(extp + 1)) != "dll") {
+			Printf("BLoader: skipping %s because non-dll.", module.c_str());
 			continue;
+		}
 		module = module.substr(0, extp);
-
+		Printf("BLoader: loading %s", module.c_str());
 		// Got the name, so load as module instead of library
-		loadModule(module);
+		int status = loadModule(module);
+		if (status != BL_OK) {
+			Printf("BLoader: Failed to load %s.", module.c_str());
+			Printf("Reason: %s", bloader_getError(status));
+		}
 	}
 
 	folder.close();
