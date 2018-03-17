@@ -2,9 +2,7 @@
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 
 # The name of the project
-set(APP_NAME BLoader)
-
-set(LIB_NAME BLoader_lib)
+set(LIB_NAME BLoader)
 
 # Sources and headers to be included in compilation
 set(SOURCES
@@ -29,11 +27,11 @@ set(HEADERS
 include_directories("include/")
 include_directories("project/")
 
-# Compile as a library
-add_library(${LIB_NAME} ${SOURCES} ${HEADERS})
+# Make sure functions are exported
+add_definitions(-DBLOADER_DLL=1)
 
-# And as a DLL as well.
-add_library(${APP_NAME} SHARED ${SOURCES} ${HEADERS})
+# Compile as a library
+add_library(${LIB_NAME} SHARED ${SOURCES} ${HEADERS})
 
 # Link the library with more libraries, if needed
-target_link_libraries(${APP_NAME})
+target_link_libraries(${LIB_NAME})

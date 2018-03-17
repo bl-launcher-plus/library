@@ -6,18 +6,32 @@
  * Used to communicate with and through BLoader
  */
 
+#define STR2(str) #str
+#define STR(str) STR2(str)
+
 #define BLOADER_VERSION 1
-#define BLOADER_VERSION_STRING "v0.0.1"
+#define BLOADER_VERSION_MAJOR 0
+#define BLOADER_VERSION_MINOR 0
+#define BLOADER_VERSION_BUILD 1
+#define BLOADER_VERSION_STRING ("v" STR(BLOADER_VERSION_MAJOR) STR(BLOADER_VERSION_MINOR) STR(BLOADER_VERSION_BUILD))
 
 /*
  * Macros to make it easier to specify what level the text printed out to console should be.
  * Info would be a blue, warning would be a dark grey/light grey, and error would be red.
-*/
+ */
 
 #define BLOADER_CONSOLE_INFO "\x05"
 #define BLOADER_CONSOLE_ERROR "\x03"
 #define BLOADER_CONSOLE_WARN "\x04" 
 
+/*
+ * Handling the exporting of the library
+ */
+#ifdef BLOADER_DLL
+#define BLOADER_EXPORT __declspec(dllexport)
+#else
+#define BLOADER_EXPORT __declspec(dllimport)
+#endif // BLOADER_DLL
 
 #ifdef __cplusplus
 #define BL_EXTERN extern "C"
@@ -67,22 +81,22 @@ typedef const char * (*bl_callback_string)(void * object, int argc, const char *
  */
 
 // Get version for this library when compiled
-int bloader_version();
+BLOADER_EXPORT int bloader_version();
 
-const char * bloader_getError(int errorcode);
+BLOADER_EXPORT const char * bloader_getError(int errorcode);
 
-int bloader_load(const char * name);
-int bloader_unload(const char * name);
+BLOADER_EXPORT int bloader_load(const char * name);
+BLOADER_EXPORT int bloader_unload(const char * name);
 
 /*
  * Module handling
  */
 
-int bloader_module_count();
-const blmodule * bloader_module_fromIndex(int i);
-const blmodule * bloader_module_fromName(const char * name);
-const char* bloader_version_string();
-int bloader_module_exist(const blmodule * module);
+BLOADER_EXPORT int bloader_module_count();
+BLOADER_EXPORT const blmodule * bloader_module_fromIndex(int i);
+BLOADER_EXPORT const blmodule * bloader_module_fromName(const char * name);
+BLOADER_EXPORT const char* bloader_version_string();
+BLOADER_EXPORT int bloader_module_exist(const blmodule * module);
 
 /*
  * Module communication
@@ -96,30 +110,30 @@ int bloader_module_exist(const blmodule * module);
  * BL console features
  */
 
-void bloader_consolefunction_void(blmodule * module, const char * nameSpace, const char * name,
+BLOADER_EXPORT void bloader_consolefunction_void(blmodule * module, const char * nameSpace, const char * name,
 	bl_callback_void, const char * usage, int minArgs, int maxArgs);
-void bloader_consolefunction_bool(blmodule * module, const char * nameSpace, const char * name,
+BLOADER_EXPORT void bloader_consolefunction_bool(blmodule * module, const char * nameSpace, const char * name,
 	bl_callback_bool, const char * usage, int minArgs, int maxArgs);
-void bloader_consolefunction_int(blmodule * module, const char * nameSpace, const char * name,
+BLOADER_EXPORT void bloader_consolefunction_int(blmodule * module, const char * nameSpace, const char * name,
 	bl_callback_int, const char * usage, int minArgs, int maxArgs);
-void bloader_consolefunction_float(blmodule * module, const char * nameSpace, const char * name,
+BLOADER_EXPORT void bloader_consolefunction_float(blmodule * module, const char * nameSpace, const char * name,
 	bl_callback_float, const char * usage, int minArgs, int maxArgs);
-void bloader_consolefunction_string(blmodule * module, const char * nameSpace, const char * name,
+BLOADER_EXPORT void bloader_consolefunction_string(blmodule * module, const char * nameSpace, const char * name,
 	bl_callback_string, const char * usage, int minArgs, int maxArgs);
 
-void bloader_consolevariable_bool(blmodule * module, const char * name, int * var);
-void bloader_consolevariable_int(blmodule * module, const char * name, int * var);
-void bloader_consolevariable_float(blmodule * module, const char * name, float * var);
-void bloader_consolevariable_string(blmodule * module, const char * name, char * var);
+BLOADER_EXPORT void bloader_consolevariable_bool(blmodule * module, const char * name, int * var);
+BLOADER_EXPORT void bloader_consolevariable_int(blmodule * module, const char * name, int * var);
+BLOADER_EXPORT void bloader_consolevariable_float(blmodule * module, const char * name, float * var);
+BLOADER_EXPORT void bloader_consolevariable_string(blmodule * module, const char * name, char * var);
 
-const char * bloader_getVariable(const char * name);
-void bloader_setVariable(const char * name, const char * value);
+BLOADER_EXPORT const char * bloader_getVariable(const char * name);
+BLOADER_EXPORT void bloader_setVariable(const char * name, const char * value);
 
 /*
  * Interface for other libraries
  */
 
-void * bloader_symbol(const blmodule * module, const char * func);
+BLOADER_EXPORT void * bloader_symbol(const blmodule * module, const char * func);
 
 #ifdef __cplusplus
 }
