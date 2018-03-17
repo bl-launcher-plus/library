@@ -108,6 +108,12 @@ std::function<T> libfunctionex(const decltype(lib_impl::lib) lib, const char * f
 class lib_impl
 {
 public:
+	inline ~lib_impl()
+	{
+		// Implementation is kept alive at all times
+		// Once the last reference is gone, then it will unload
+		unload();
+	}
 	// Load the library
 	inline bool load(const std::string & path)
 	{
@@ -148,12 +154,6 @@ public:
 
 	// Check if library is loaded
 	inline operator bool() const { return !!lib; }
-	// Copy over library to other structure
-	inline lib_impl & operator=(const lib_impl & l)
-	{
-		lib = l.lib;
-		return *this;
-	}
 private:
 	decltype(libload(0)) lib = decltype(lib)();
 };

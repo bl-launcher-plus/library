@@ -7,12 +7,9 @@
 
 Library::Library()
 {
-	impl = new lib_impl;
-}
-
-Library::~Library()
-{
-	delete impl;
+	// As the destructor will unload the library, keep reference
+	// count so it is only unloaded when there is no reference left.
+	impl = std::make_shared<lib_impl>();
 }
 
 // Load the library
@@ -51,6 +48,6 @@ Library::operator bool() const
 // Copy over library to other structure
 Library & Library::operator=(const Library & l)
 {
-	*impl = *l.impl;
+	impl = l.impl;
 	return *this;
 }

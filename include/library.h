@@ -4,12 +4,12 @@
 
 #include <string>
 #include <functional>
+#include <memory>
 
 class Library
 {
 public:
 	Library();
-	~Library();
 	// Load the library
 	bool load(const std::string & path);
 	// Unload the library
@@ -42,7 +42,7 @@ public:
 	// Copy over library to other structure
 	Library & operator=(const Library & l);
 private:
-	class lib_impl * impl;
+	std::shared_ptr<class lib_impl> impl;
 };
 
 #endif // LIBRARY_H
