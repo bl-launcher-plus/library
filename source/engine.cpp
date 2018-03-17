@@ -336,7 +336,7 @@ int Engine::loadLibrary(const std::string & name)
 	module->library = lib;
 
 	// Initialize the module
-	if (init() != 0)
+	if (init(module.get()) != 0)
 	{
 		lib.unload();
 		return BL_LIBRARY_INIT_ERROR;

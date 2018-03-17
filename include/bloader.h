@@ -29,8 +29,10 @@
  */
 #ifdef BLOADER_DLL
 #define BLOADER_EXPORT __declspec(dllexport)
+#define BLOADER_IMPORT
 #else
 #define BLOADER_EXPORT __declspec(dllimport)
+#define BLOADER_IMPORT __declspec(dllexport)
 #endif // BLOADER_DLL
 
 #ifdef __cplusplus

@@ -21,9 +21,9 @@ typedef struct BLinfo
 	char description[4096];
 } blinfo;
 
-int blibrary_initialize();
+BLOADER_IMPORT int blibrary_initialize(blmodule * module);
 
-void blibrary_info(blinfo * info);
+BLOADER_IMPORT void blibrary_info(blinfo * info);
 
 #ifdef __cplusplus
 }
