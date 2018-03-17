@@ -10,6 +10,7 @@ typedef U32 SimObjectId;
 
 struct SimObject;
 
+//Typedefs for callbacks that Torque will call the function as.
 typedef const char *(*StringCallback)(SimObject *obj, int argc, const char* argv[]);
 typedef int(*IntCallback)   (SimObject *obj, int argc, const char* argv[]);
 typedef float(*FloatCallback) (SimObject *obj, int argc, const char* argv[]);
@@ -17,11 +18,7 @@ typedef void(*VoidCallback)  (SimObject *obj, int argc, const char* argv[]);
 typedef bool(*BoolCallback)  (SimObject *obj, int argc, const char* argv[]);
 
 
-struct Identifier {
-	const char* mNamespace;
-	const char* mName;
-};
-
+//Structs that we stole from Torque. Converted from classes to structs...
 struct Namespace
 {
 	const char* mName;
@@ -69,13 +66,9 @@ struct Namespace
 	Entry *mEntryList;
 	Entry **mHashTable;
 	U32 mHashSize;
-	U32 mHashSequence;  ///< @note The hash sequence is used by the autodoc console facility
-						///        as a means of testing reference state.
+	U32 mHashSequence; 
+						
 	char * lastUsage;
-};
-
-struct ConsoleObject
-{
 };
 
 enum ACRFieldTypes
@@ -101,7 +94,7 @@ struct SimObject
 							 ModDynamicFields = BIT(8)     ///< The object allows you to read/modify dynamic fields
 	};
 
-	char _padding1[4];
+	char _padding1[4]; //This padding actually contains the AbstractClassRep of the object.
 	const char *objectName;
 	// char _padding2[24];
 	// SimObjectId mId;
@@ -115,7 +108,6 @@ struct SimObject
 	Namespace *mNameSpace;
 	unsigned int mTypeMask;
 	void *mFieldDictionary;
-	void setDatablock(SimObject* obj, const char* datablock);
 };
 
 struct SimDatablock: public SimObject {
@@ -172,8 +164,6 @@ struct Field {
 	EnumTable*    table;         ///< If this is an enum, this points to the table defining it.
 	BitSet32       flag;          ///< Stores various flags
 	void *validator;     ///< Validator, if any.
-	//void * setDataFn;     ///< Set data notify Fn
-	//void*  getDataFn;     ///< Get data notify Fn
 };
 
 struct SimEvent
@@ -204,25 +194,30 @@ struct SimEvent
 #define BLSCAN(target, pattern, mask)            \
 	target = (target##Fn)ScanFunc(pattern, mask); \
 	if(target == NULL)                             \
-		Printf("torquedll | Cannot find function "#target"!");
+		Printf("BLoader | Cannot find function "#target"!");
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Engine function declarations
 
+//Utility functions for looking up, and calling a TorqueScript function.
 Namespace::Entry* fastLookup(const char* ourNamespace, const char* name);
-//Con::printf
 void* ts__fastCall(Namespace::Entry* ourCall, SimObject* obj, unsigned argc, ...);
+Namespace::Entry* passThroughLookup(Namespace* ns, const char* name);
+
+//Con::printf
 BLFUNC_EXTERN(void, , Printf, const char* format, ...);
 
+//Insert a string into the StringTable.
 extern const char *StringTableEntry(const char *str, bool caseSensitive = false);
+//Pointer to the Torque StringTable.
 extern DWORD StringTable;
-extern bool setDatablock;
+
+//Various definitions for Torque functions that we grab early on.
 BLFUNC_EXTERN(bool, , initGame, int argc, const char **argv);
 BLFUNC_EXTERN(Namespace *, , LookupNamespace, const char *ns);
 BLFUNC_EXTERN(const char *, __thiscall, StringTableInsert, DWORD stringTablePtr, const char* val, const bool caseSensitive)
 BLFUNC_EXTERN(Namespace::Entry *, __thiscall, Namespace__lookup, Namespace *this_, const char *name)
-//BLFUNC_EXTERN(void *, __thiscall, CodeBlock__exec, void *this_, U32 offset, const char *fnName, Namespace *ns, U32 argc, const char **argv, bool noCalls, const char *packageName, int setFrame)
 BLFUNC_EXTERN(const char *, __thiscall, CodeBlock__exec, void *this_, U32 offset, Namespace *ns, const char *fnName, U32 argc, const char **argv, bool noCalls, const char *packageName, int setFrame)
 BLFUNC_EXTERN(SimObject *, , Sim__findObject_name, const char *name);
 BLFUNC_EXTERN(SimObject *, , Sim__findObject_id, unsigned int id);
@@ -234,19 +229,11 @@ BLFUNC_EXTERN(bool, __thiscall, SimObject__registerObject, SimObject *this_);
 BLFUNC_EXTERN(void, __thiscall, SimObject__registerReference, SimObject *this_, SimObject **ptr);
 BLFUNC_EXTERN(void, __thiscall, SimObject__unregisterReference, SimObject *this_, SimObject **ptr);
 BLFUNC_EXTERN(ConsoleObject *, , AbstractClassRep_create_className, const char *className);
-/*
-BLFUNC_EXTERN(void, , SimObject__setDataBlock, SimObject *this_, const char *datablock);
-BLFUNC_EXTERN(bool, , fxDTSBrick__plant, SimObject *this_);
-BLFUNC_EXTERN(void, , fxDTSBrick__setTrusted, SimObject *this_, const char* kappa);
-*/
-BLFUNC_EXTERN(void, __thiscall, SimObject__delete, SimObject *this_);
-//This function is really ..odd.
-//Help.
-//new metario to the rescue!! fuck that!! we're making the user do it on his/her/idk about your pronouns own!!
-//BLFUNC_EXTERN(void, __thiscall, fxDTSBrick__setDataBlock, SimObject *this_, const char *dataBlock);
+
+//Scan for a function
 DWORD ScanFunc(const char* pattern, const char* mask);
+//Obligatory thanks s0beit
 void PatchByte(BYTE* location, BYTE value);
-Namespace::Entry* passThroughLookup(Namespace* ns, const char* name);
 void ConsoleFunction(const char* scope, const char* name, StringCallback callBack, const char* usage, int minArgs, int maxArgs);
 void ConsoleFunction(const char* scope, const char* name, IntCallback callBack, const char* usage, int minArgs, int maxArgs);
 void ConsoleFunction(const char* scope, const char* name, FloatCallback callBack, const char* usage, int minArgs, int maxArgs);
@@ -260,9 +247,6 @@ void ConsoleVariable(const char *name, char *data);
 
 //Evaluate a torquescript string in global scope
 const char* Eval(const char* str);
-
-//Call a function
-BLFUNC_EXTERN(void, , RawCall, S32 argc, const char* argv);
 
 BLFUNC_EXTERN(void, , SetGlobalVariable, const char *name, const char *value);
 BLFUNC_EXTERN(char *, , GetGlobalVariable, const char *name);

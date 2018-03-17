@@ -40,11 +40,9 @@ SimObject__registerObjectFn SimObject__registerObject;
 SimObject__registerReferenceFn SimObject__registerReference;
 SimObject__unregisterReferenceFn SimObject__unregisterReference;
 AbstractClassRep_create_classNameFn AbstractClassRep_create_className;
-SimObject__deleteFn SimObject__delete;
-//SimObject__setDataBlockFn SimObject__setDataBlock;
-//fxDTSBrick__setDataBlockFn fxDTSBrick__setDataBlock;
-//fxDTSBrick__plantFn fxDTSBrick__plant;
-//fxDTSBrick__setTrustedFn fxDTSBrick__setTrusted;
+SetGlobalVariableFn SetGlobalVariable;
+GetGlobalVariableFn GetGlobalVariable;
+
 
 //Namespace::addCommand overloads
 BLFUNC(void, __thiscall, AddStringCommand, Namespace *ns, const char* name, StringCallback cb, const char *usage, int minArgs, int maxArgs);
@@ -59,9 +57,6 @@ BLFUNC(void, __thiscall, AddVariable, DWORD dictionaryPtr, const char* name, int
 //Executing code and calling torquescript functions
 BLFUNC(const char*, , Evaluate, const char* string, bool echo, const char* fileName);
 
-RawCallFn RawCall;
-SetGlobalVariableFn SetGlobalVariable;
-GetGlobalVariableFn GetGlobalVariable;
 //BLFUNC(void, , SetGlobalVariable, const char *name, const char *value);
 //BLFUNC(char *, , GetGlobalVariable, const char *name);
 
@@ -71,6 +66,9 @@ GetGlobalVariableFn GetGlobalVariable;
 //Functions
 
 //static std::map<Identifier*, Namespace::Entry*> cache;
+
+//These std::maps are used to cache Namespace::Entrys/Namespaces. 
+//This is done to avoid as many calls to Torque as possible.
 static std::map<std::string, Namespace::Entry*> cache;
 static std::map<const char*, Namespace*> nscache;
 static Namespace* GlobalNS;
@@ -440,16 +438,10 @@ bool torque_init()
 
 	BLSCAN(AddVariable, "\x8B\x44\x24\x04\x56\x8B\xF1\x80\x38\x24\x74\x1A", "xxxxxxxxxxxx");
 	BLSCAN(Evaluate, "\x8A\x44\x24\x08\x84\xC0\x56\x57\x8B\x7C\x24\x0C", "xxxxxxxxxxxx");
-	SimObject__delete = (SimObject__deleteFn)(void*)0x4b4e30;
-	//32
-	BLSCAN(RawCall, "\x8B\x0D\x00\x00\x00\x00\x56\x8B\x74\x24\x0C", "xx????xxxxx");
-	//	BLSCAN(fxDTSBrick__setDataBlock, "\x8B\x44\x24\x04\x56\x8B\x74\x24\x10\x50\xE8\x11\xE3\x00\x00\x83\xC4\x04\x5E\xC3\xCC\xCC\xCC\xCC", "xxxxxxxxxxxxx??xxxxxxxxx");
-	//	BLSCAN(fxDTSBrick__plant, "\x8B\x4C\x24\x04\xE9\x07\xEE\x00\x00\xCC\xCC\xCC\xCC\xCC\xCC\xCC", "xxxxxxx??xxxxxxx")
-	//		BLSCAN(SimObject__setDataBlock, "\x56\x8B\x74\x24\x10\x57\x8B\x7C\x24\x0C\xE8\x51\xFE\xFF\xFF\x5F\x5E\xC3\xCC\xCC\xCC\xCC\xCC\xCC", "xxxxxxxxxxxxxxxxxxxxxxx");
 	BLSCAN(GetGlobalVariable, "\x56\x8b\x74\x24\x08\x85\xf6\x74\x00\x8a\x06\x84\xc0\x75", "xxxxxxxx?xxxxx");
 	BLSCAN(SetGlobalVariable, "\x56\x8b\x74\x24\x08\x80\x3e\x24\x8b\xc6\x74\x00\x56\xe8", "xxxxxxxxxxx?xx");
+
 	//since it's so small we need a long sig
-	//	BLSCAN(fxDTSBrick__setTrusted, "\x8B\x44\x24\x0C\x8B\x48\x08\x51\xE8\x13\xCE\xEC\x00\x8B\x54\x24\x08\x83\xC4\x04\x88\x82\xB6\x02", "xxxxxxxxxxxx?xxxxxxxxxxx");
 	//The string table is used in lookupnamespace so we can get it's location
 	StringTable = *(DWORD*)(*(DWORD*)((DWORD)LookupNamespace + 15));
 
