@@ -24,6 +24,8 @@ bool Engine::init()
 {
 	if (!torque_init())
 		return false;
+
+	Printf("== BLoader %s loaded. ==", BLOADER_VERSION); //just print it out so we do know that it's in.
 	return true;
 }
 bool Engine::destroy()
@@ -31,6 +33,7 @@ bool Engine::destroy()
 	// Just clear them. No need to unlink the connection as it is already destroyed
 	// The rest is handled automatically
 	modules.clear();
+	Printf("== BLoader %s unloaded. ==", BLOADER_VERSION); //again, printing it out for final confirmation.
 	return true;
 }
 
