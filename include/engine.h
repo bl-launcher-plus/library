@@ -23,9 +23,11 @@ public:
 
 	// Module handling
 	size_t countModules() const;
-	const blmodule * getModule(int i) const;
-	const blmodule * getModule(const std::string & name) const;
-	int moduleExist(const blmodule * module) const;
+	blmodule * getModule(int i) const;
+	blmodule * getModule(const std::string & name) const;
+	int moduleExist(const std::string & name) const;
+	int moduleLoaded(const std::string & name) const;
+	int moduleLoaded(const blmodule * module) const;
 
 	// Console funcitonalities
 	void consoleFunction(blmodule * module, const char * nameSpace, const char * name,

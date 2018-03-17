@@ -108,7 +108,7 @@ size_t Engine::countModules() const
 	return modules.size();
 }
 
-const blmodule * Engine::getModule(int i) const
+blmodule * Engine::getModule(int i) const
 {
 	if (i < 0 || (size_t)i >= modules.size())
 		return nullptr;
@@ -117,7 +117,7 @@ const blmodule * Engine::getModule(int i) const
 	std::advance(it, i);
 	return it->second.get();
 }
-const blmodule * Engine::getModule(const std::string & name) const
+blmodule * Engine::getModule(const std::string & name) const
 {
 	auto it = modules.find(name);
 	if (it == modules.end())
@@ -125,7 +125,26 @@ const blmodule * Engine::getModule(const std::string & name) const
 	return it->second.get();
 }
 
-int Engine::moduleExist(const blmodule * module) const
+int Engine::moduleExist(const std::string & name) const
+{
+	// Find i exist in list already
+	auto it = modules.find(name);
+	if (it != modules.end())
+		return BL_OK;
+	// Check if found in filesystem
+	std::string path = std::string("modules/") + std::string(name) + std::string(".dll");
+	return Filesystem::exists(path) ? BL_OK : BL_INVALID_LIBRARY;
+}
+
+int Engine::moduleLoaded(const std::string & name) const
+{
+	auto it = modules.find(name);
+	if (it == modules.end())
+		return BL_INVALID_LIBRARY;
+	return BL_OK;
+}
+
+int Engine::moduleLoaded(const blmodule * module) const
 {
 	if (!module)
 		return BL_INVALID_POINTER;
@@ -133,7 +152,7 @@ int Engine::moduleExist(const blmodule * module) const
 	auto it = modules.find(name);
 	if (it == modules.end())
 		return BL_INVALID_LIBRARY;
-	if (it->second->version != module->version)
+	if (module->version != 0 && it->second->version != module->version)
 		return BL_INVALID_VERSION;
 	return BL_OK;
 }

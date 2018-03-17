@@ -8,7 +8,7 @@ Engine g_engine;
 bool bloader_init()
 {
 	if(g_engine.init()) {
-		Printf("BLoader %s loaded successfully.", bloader_version_string());
+		Printf("BLoader %s loaded successfully.", bloader_versionString());
 		return true;
 	}
 	else {
@@ -21,7 +21,7 @@ bool bloader_init()
 bool bloader_destroy()
 {
 	if(g_engine.destroy()) {
-		Printf("BLoader %s unloaded successfully.", bloader_version_string());
+		Printf("BLoader %s unloaded successfully.", bloader_versionString());
 		return true;
 	}
 	else {
@@ -46,7 +46,7 @@ int bloader_version()
 	return BLOADER_VERSION;
 }
 
-const char* bloader_version_string() {
+const char* bloader_versionString() {
 	return BLOADER_VERSION_STRING;
 }
 
@@ -91,12 +91,12 @@ int bloader_module_count()
 	return g_engine.countModules();
 }
 
-const blmodule * bloader_module_fromIndex(int i)
+blmodule * bloader_module_fromIndex(int i)
 {
 	return g_engine.getModule(i);
 }
 
-const blmodule * bloader_module_fromName(const char * name)
+blmodule * bloader_module_fromName(const char * name)
 {
 	if (!name)
 		return nullptr;
@@ -104,9 +104,14 @@ const blmodule * bloader_module_fromName(const char * name)
 	return g_engine.getModule(_name);
 }
 
-int bloader_module_exist(const blmodule * module)
+int bloader_module_exist(const char * name)
 {
-	return g_engine.moduleExist(module);
+	return g_engine.moduleExist(name);
+}
+
+int bloader_module_loaded(const blmodule * module)
+{
+	return g_engine.moduleLoaded(module);
 }
 
 void bloader_consolefunction_void(blmodule * module, const char * nameSpace, const char * name,

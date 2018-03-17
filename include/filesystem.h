@@ -28,6 +28,8 @@ public:
 	// Create a folder
 	static bool createFolder(const std::string & path);
 
+	static bool exists(const std::string & path);
+
 private:
 	struct filesystem_impl * impl;
 };

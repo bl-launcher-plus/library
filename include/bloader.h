@@ -82,7 +82,7 @@ typedef const char * (*bl_callback_string)(void * object, int argc, const char *
 
 // Get version for this library when compiled
 BLOADER_EXPORT int bloader_version();
-BLOADER_EXPORT const char* bloader_version_string();
+BLOADER_EXPORT const char* bloader_versionString();
 
 BLOADER_EXPORT const char * bloader_getError(int errorcode);
 
@@ -94,9 +94,10 @@ BLOADER_EXPORT int bloader_unload(const char * name);
  */
 
 BLOADER_EXPORT int bloader_module_count();
-BLOADER_EXPORT const blmodule * bloader_module_fromIndex(int i);
-BLOADER_EXPORT const blmodule * bloader_module_fromName(const char * name);
-BLOADER_EXPORT int bloader_module_exist(const blmodule * module);
+BLOADER_EXPORT blmodule * bloader_module_fromIndex(int i);
+BLOADER_EXPORT blmodule * bloader_module_fromName(const char * name);
+BLOADER_EXPORT int bloader_module_exist(const char * name);
+BLOADER_EXPORT int bloader_module_loaded(const blmodule * module);
 
 /*
  * Module communication
