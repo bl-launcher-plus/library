@@ -7,13 +7,27 @@ Engine g_engine;
 // Initializating engine
 bool bloader_init()
 {
-	return g_engine.init();
+	if(g_engine.init()) {
+		Printf("BLoader %s loaded successfully.", bloader_version_string());
+		return true;
+	}
+	else {
+		Printf("BLoader failed to initialize.");
+		return false;
+	}
 }
 
 // Destroying everything
 bool bloader_destroy()
 {
-	return g_engine.destroy();
+	if(g_engine.destroy()) {
+		Printf("BLoader %s unloaded successfully.", bloader_version_string());
+		return true;
+	}
+	else {
+		Printf("Bloader failed to unload.");
+		return false;
+	}
 }
 
 // Get size of a member in a structure
@@ -30,6 +44,10 @@ inline std::string safeCopyString(const char * cstr, int size)
 int bloader_version()
 {
 	return BLOADER_VERSION;
+}
+
+const char* bloader_version_string() {
+	return BLOADER_VERSION_STRING;
 }
 
 const char * bloader_getError(int errorcode)

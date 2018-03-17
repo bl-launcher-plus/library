@@ -7,6 +7,17 @@
  */
 
 #define BLOADER_VERSION 1
+#define BLOADER_VERSION_STRING "v0.0.1"
+
+/*
+ * Macros to make it easier to specify what level the text printed out to console should be.
+ * Info would be a blue, warning would be a dark grey/light grey, and error would be red.
+*/
+
+#define BLOADER_CONSOLE_INFO "\x05"
+#define BLOADER_CONSOLE_ERROR "\x03"
+#define BLOADER_CONSOLE_WARN "\x04" 
+
 
 #ifdef __cplusplus
 #define BL_EXTERN extern "C"

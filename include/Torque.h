@@ -17,8 +17,6 @@ typedef void(*VoidCallback)  (SimObject *obj, int argc, const char* argv[]);
 typedef bool(*BoolCallback)  (SimObject *obj, int argc, const char* argv[]);
 
 
-#define BLOADER_VERSION "v0.0.2"
-
 struct Identifier {
 	const char* mNamespace;
 	const char* mName;
