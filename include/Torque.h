@@ -71,6 +71,9 @@ struct Namespace
 	char * lastUsage;
 };
 
+struct ConsoleObject {
+};
+
 enum ACRFieldTypes
 {
 	StartGroupFieldType = 0xFFFFFFFD,

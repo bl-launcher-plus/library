@@ -81,6 +81,7 @@ int bloader_unload(const char * name);
 int bloader_module_count();
 const blmodule * bloader_module_fromIndex(int i);
 const blmodule * bloader_module_fromName(const char * name);
+const char* bloader_version_string();
 int bloader_module_exist(const blmodule * module);
 
 /*

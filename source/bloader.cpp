@@ -1,5 +1,5 @@
 #include "bloader.h"
-
+#include "Torque.h"
 #include "engine.h"
 
 Engine g_engine;
