@@ -23,6 +23,9 @@ inline std::string safeCopyString(const char * cstr, int size)
 	return std::string(cstr, strnlen(cstr, size - 1));
 }
 
+// Get size of a member in a structure
+#define sizeofmember(clas, mem) (sizeof(clas::mem))
+
 char lowerChar(char in)
 {
 	if (in >= 'A' && in <= 'Z')
@@ -61,8 +64,7 @@ int Engine::loadModule(const std::string & name)
 	if (it != modules.end())
 		return BLOADER_OK;
 
-	std::string path = std::string("modules/") + std::string(name) + std::string(".dll");
-	return loadLibrary(path);
+	return loadLibrary(name);
 }
 
 int Engine::unloadModule(const std::string & name)
@@ -117,6 +119,13 @@ blmodule * Engine::getModule(int i) const
 	std::advance(it, i);
 	return it->second.get();
 }
+blmodule * Engine::getModule(const char * name) const
+{
+	if (!name)
+		return nullptr;
+	auto _name = safeCopyString(name, sizeofmember(blinfo, name));
+	return getModule(_name);
+}
 blmodule * Engine::getModule(const std::string & name) const
 {
 	auto it = modules.find(name);
@@ -148,13 +157,20 @@ int Engine::moduleLoaded(const blmodule * module) const
 {
 	if (!module)
 		return BL_INVALID_POINTER;
-	auto name = safeCopyString(module->name, sizeof(module->name));
+	auto name = safeCopyString(module->info.name, sizeof(module->info.name));
 	auto it = modules.find(name);
 	if (it == modules.end())
 		return BL_INVALID_LIBRARY;
-	if (module->version != 0 && it->second->version != module->version)
+	if (module->info.version != 0 && it->second->info.version != module->info.version)
 		return BL_INVALID_VERSION;
 	return BL_OK;
+}
+
+const blinfo * const Engine::getModuleInfo(const blmodule * module) const
+{
+	if (!module)
+		return nullptr;
+	return &module->info;
 }
 
 void Engine::consoleFunction(blmodule * module, const char * nameSpace, const char * name,
@@ -162,8 +178,7 @@ void Engine::consoleFunction(blmodule * module, const char * nameSpace, const ch
 {
 	if (!module)
 		return;
-	auto _module = static_cast<blmodule_internal *>(module);
-	_module->func_void.emplace(std::make_pair(nameSpace, name));
+	module->func_void.emplace(std::make_pair(nameSpace, name));
 	ConsoleFunction(nameSpace, name, (VoidCallback)callback, usage, minArgs, maxArgs);
 }
 void Engine::consoleFunction(blmodule * module, const char * nameSpace, const char * name,
@@ -171,8 +186,7 @@ void Engine::consoleFunction(blmodule * module, const char * nameSpace, const ch
 {
 	if (!module)
 		return;
-	auto _module = static_cast<blmodule_internal *>(module);
-	_module->func_void.emplace(std::make_pair(nameSpace, name));
+	module->func_void.emplace(std::make_pair(nameSpace, name));
 	ConsoleFunction(nameSpace, name, (BoolCallback)callback, usage, minArgs, maxArgs);
 }
 void Engine::consoleFunction(blmodule * module, const char * nameSpace, const char * name,
@@ -180,8 +194,7 @@ void Engine::consoleFunction(blmodule * module, const char * nameSpace, const ch
 {
 	if (!module)
 		return;
-	auto _module = static_cast<blmodule_internal *>(module);
-	_module->func_void.emplace(std::make_pair(nameSpace, name));
+	module->func_void.emplace(std::make_pair(nameSpace, name));
 	ConsoleFunction(nameSpace, name, (IntCallback)callback, usage, minArgs, maxArgs);
 }
 void Engine::consoleFunction(blmodule * module, const char * nameSpace, const char * name,
@@ -189,8 +202,7 @@ void Engine::consoleFunction(blmodule * module, const char * nameSpace, const ch
 {
 	if (!module)
 		return;
-	auto _module = static_cast<blmodule_internal *>(module);
-	_module->func_void.emplace(std::make_pair(nameSpace, name));
+	module->func_void.emplace(std::make_pair(nameSpace, name));
 	ConsoleFunction(nameSpace, name, (FloatCallback)callback, usage, minArgs, maxArgs);
 }
 void Engine::consoleFunction(blmodule * module, const char * nameSpace, const char * name,
@@ -198,8 +210,7 @@ void Engine::consoleFunction(blmodule * module, const char * nameSpace, const ch
 {
 	if (!module)
 		return;
-	auto _module = static_cast<blmodule_internal *>(module);
-	_module->func_void.emplace(std::make_pair(nameSpace, name));
+	module->func_void.emplace(std::make_pair(nameSpace, name));
 	ConsoleFunction(nameSpace, name, (StringCallback)callback, usage, minArgs, maxArgs);
 }
 
@@ -207,32 +218,28 @@ void Engine::consoleVariable(blmodule * module, const char * name, bool * var)
 {
 	if (!module)
 		return;
-	auto _module = static_cast<blmodule_internal *>(module);
-	_module->var_bool.emplace(name);
+	module->var_bool.emplace(name);
 	ConsoleVariable(name, var);
 }
 void Engine::consoleVariable(blmodule * module, const char * name, int * var)
 {
 	if (!module)
 		return;
-	auto _module = static_cast<blmodule_internal *>(module);
-	_module->var_int.emplace(name);
+	module->var_int.emplace(name);
 	ConsoleVariable(name, var);
 }
 void Engine::consoleVariable(blmodule * module, const char * name, float * var)
 {
 	if (!module)
 		return;
-	auto _module = static_cast<blmodule_internal *>(module);
-	_module->var_float.emplace(name);
+	module->var_float.emplace(name);
 	ConsoleVariable(name, var);
 }
 void Engine::consoleVariable(blmodule * module, const char * name, char * var)
 {
 	if (!module)
 		return;
-	auto _module = static_cast<blmodule_internal *>(module);
-	_module->var_string.emplace(name);
+	module->var_string.emplace(name);
 	ConsoleVariable(name, var);
 }
 
@@ -249,11 +256,10 @@ void * Engine::getSymbol(const blmodule * module, const std::string & func) cons
 {
 	if (!module)
 		return nullptr;
-	auto _module = static_cast<const blmodule_internal *>(module);
-	if (!_module->library)
+	if (!module->library)
 		return nullptr;
 
-	return _module->library.symbol(func);
+	return module->library.symbol(func);
 }
 
 bool Engine::loadLibraries()
@@ -290,17 +296,19 @@ bool Engine::loadLibraries()
 	return true;
 }
 
-int Engine::loadLibrary(const std::string & path)
+int Engine::loadLibrary(const std::string & name)
 {
-	if (path.empty())
+	if (name.empty())
 		return BL_INVALID_POINTER;
+
+	std::string path = std::string("modules/") + std::string(name) + std::string(".dll");
 
 	// Load library
 	Library lib;
 	if (!lib.load(path))
 		return BL_INVALID_LIBRARY;
 
-	// Locate needed functionality
+	// Locate initialization
 	auto init = lib.function(blibrary_initialize);
 	if (!init)
 	{
@@ -308,25 +316,31 @@ int Engine::loadLibrary(const std::string & path)
 		return BL_MISSING_INITIALIZE;
 	}
 
+	// Locate info
+	auto info = lib.function(blibrary_info);
+	if (!info)
+	{
+		lib.unload();
+		return BL_MISSING_INFO;
+	}
+
 	// Allocate module
-	auto module = std::make_shared<blmodule_internal>();
+	auto module = std::make_shared<BLmodule>();
 	module->library = lib;
 
 	// Initialize the module
-	if (init(module.get()) != 0)
+	if (init() != 0)
 	{
 		lib.unload();
 		return BL_LIBRARY_INIT_ERROR;
 	}
 
-	// Calculate max size of name
-	std::string name = safeCopyString(module->name, sizeof(module->name));
+	// Get the rest of the information
+	info(&module->info);
 
-	if (name.empty())
-	{
-		lib.unload();
-		return BL_LIBRARY_NO_NAME;
-	}
+	// Null last byte for those that borked up
+	module->info.name[sizeof(module->info.name) - 1] = 0;
+	module->info.description[sizeof(module->info.description) - 1] = 0;
 
 	// Put in map
 	modules.emplace(name, module);

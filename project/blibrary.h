@@ -13,9 +13,17 @@
 extern "C" {
 #endif // __cplusplus
 
-int blibrary_initialize(blmodule * info);
+// Information about module
+typedef struct BLinfo
+{
+	char name[256];
+	int version;
+	char description[4096];
+} blinfo;
 
+int blibrary_initialize();
 
+void blibrary_info(blinfo * info);
 
 #ifdef __cplusplus
 }

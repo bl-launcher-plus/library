@@ -8,8 +8,6 @@
 
 #include "bloader.h"
 
-struct blmodule_internal;
-
 class Engine
 {
 public:
@@ -24,10 +22,12 @@ public:
 	// Module handling
 	size_t countModules() const;
 	blmodule * getModule(int i) const;
+	blmodule * getModule(const char * name) const;
 	blmodule * getModule(const std::string & name) const;
 	int moduleExist(const std::string & name) const;
 	int moduleLoaded(const std::string & name) const;
 	int moduleLoaded(const blmodule * module) const;
+	const blinfo * const getModuleInfo(const blmodule * module) const;
 
 	// Console funcitonalities
 	void consoleFunction(blmodule * module, const char * nameSpace, const char * name,
@@ -53,7 +53,7 @@ public:
 	void * getSymbol(const blmodule * module, const std::string & func) const;
 
 private:
-	std::unordered_map<std::string, std::shared_ptr<blmodule_internal>> modules;
+	std::unordered_map<std::string, std::shared_ptr<blmodule>> modules;
 
 	bool loadLibraries();
 	int loadLibrary(const std::string & path);

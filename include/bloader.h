@@ -58,16 +58,14 @@ enum blerror
 	BL_INVALID_LIBRARY,
 	BL_INVALID_VERSION,
 	BL_MISSING_INITIALIZE,
+	BL_MISSING_INFO,
 	BL_LIBRARY_INIT_ERROR,
 	BL_LIBRARY_NO_NAME
 };
 
 // A module informations
-typedef struct
-{
-	char name[256];
-	int version;
-} blmodule;
+typedef struct BLmodule blmodule;
+typedef struct BLinfo blinfo;
 
 // Callback for console functions
 typedef void (*bl_callback_void)(void * object, int argc, const char * argv[]);
@@ -98,6 +96,7 @@ BLOADER_EXPORT blmodule * bloader_module_fromIndex(int i);
 BLOADER_EXPORT blmodule * bloader_module_fromName(const char * name);
 BLOADER_EXPORT int bloader_module_exist(const char * name);
 BLOADER_EXPORT int bloader_module_loaded(const blmodule * module);
+BLOADER_EXPORT const blinfo * const bloader_module_info(const blmodule * module);
 
 /*
  * Module communication

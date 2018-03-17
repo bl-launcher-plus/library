@@ -5,19 +5,22 @@
 #include <unordered_set>
 #include <string>
 
-#include "bloader.h"
+#include "blibrary.h"
 #include "library.h"
 
 /*
  * Real implementation of blmodule
  */
-struct blmodule_internal : public blmodule
+struct BLmodule
 {
-	blmodule_internal()
+	BLmodule()
 	{
-		memset(name, 0, sizeof(name));
-		version = 0;
+		// Note: This is not that secure, but it works
+		memset(&info, 0, sizeof(info));
 	}
+
+	BLinfo info;
+
 	Library library;
 
 	// Keep track of current implementations

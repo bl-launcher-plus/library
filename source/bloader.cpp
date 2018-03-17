@@ -30,16 +30,6 @@ bool bloader_destroy()
 	}
 }
 
-// Get size of a member in a structure
-#define sizeofmember(clas, mem) (sizeof(clas::mem))
-
-// Safely copy a cstring to string
-// Note: Put this somewhere safe
-inline std::string safeCopyString(const char * cstr, int size)
-{
-	return std::string(cstr, strnlen(cstr, size - 1));
-}
-
 
 int bloader_version()
 {
@@ -100,8 +90,7 @@ blmodule * bloader_module_fromName(const char * name)
 {
 	if (!name)
 		return nullptr;
-	auto _name = safeCopyString(name, sizeofmember(blmodule, name));
-	return g_engine.getModule(_name);
+	return g_engine.getModule(name);
 }
 
 int bloader_module_exist(const char * name)
@@ -112,6 +101,13 @@ int bloader_module_exist(const char * name)
 int bloader_module_loaded(const blmodule * module)
 {
 	return g_engine.moduleLoaded(module);
+}
+
+const blinfo * const bloader_module_info(const blmodule * module)
+{
+	if (!module)
+		return nullptr;
+	return g_engine.getModuleInfo(module);
 }
 
 void bloader_consolefunction_void(blmodule * module, const char * nameSpace, const char * name,
