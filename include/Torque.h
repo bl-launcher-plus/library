@@ -9,6 +9,7 @@ typedef double F64;
 typedef U32 SimObjectId;
 
 struct SimObject;
+struct ConsoleObject;
 
 //Typedefs for callbacks that Torque will call the function as.
 typedef const char *(*StringCallback)(SimObject *obj, int argc, const char* argv[]);
@@ -69,9 +70,6 @@ struct Namespace
 	U32 mHashSequence; 
 						
 	char * lastUsage;
-};
-
-struct ConsoleObject {
 };
 
 enum ACRFieldTypes
