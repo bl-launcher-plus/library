@@ -70,7 +70,8 @@ GetGlobalVariableFn GetGlobalVariable;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Functions
 
-static std::map<Identifier*, Namespace::Entry*> cache;
+//static std::map<Identifier*, Namespace::Entry*> cache;
+static std::map<std::string, Namespace::Entry*> cache;
 static std::map<const char*, Namespace*> nscache;
 static Namespace* GlobalNS;
 
@@ -80,10 +81,12 @@ void rewrite__fatal() {
 
 Namespace::Entry* passThroughLookup(Namespace* ns, const char* name) {
 	Namespace::Entry* entry;
-	std::map<Identifier*, Namespace::Entry*>::iterator it;
-	Identifier* lol = new Identifier();
-	lol->mName = name;
-	lol->mNamespace = ns->mName;
+	std::map<std::string, Namespace::Entry*>::iterator it;
+
+	std::string lol(ns->mName);
+	lol.append("__");
+	lol.append(name);
+	//Identifier* lol = new Identifier();
 	it = cache.find(lol); //Look into our Namespace::Entry* cache..
 	if (it != cache.end()) {
 		entry = it->second;
@@ -91,15 +94,13 @@ Namespace::Entry* passThroughLookup(Namespace* ns, const char* name) {
 			rewrite__fatal();
 			Printf("Fatal: found nullptr in cache!");
 			cache.erase(it); //Erase it so we don't encounter it again.
-			delete lol;
 			return nullptr;
 		}
 	}
 	else {
-		entry = Namespace__lookup(ns, StringTableEntry(name));
+		entry = Namespace__lookup(ns, name);
 		if (entry == NULL) {
 			//Printf("Could not find function.");
-			delete lol;
 			return nullptr;
 		}
 		cache.insert(cache.end(), std::make_pair(lol, entry)); //Insert it so further calls are optimized.
@@ -119,7 +120,7 @@ Namespace::Entry* fastLookup(const char* ourNamespace, const char* name) {
 	}
 	else {
 		std::map<const char*, Namespace*>::iterator its;
-		its = nscache.find(ourNamespace);
+		its = nscache.find(StringTableEntry(ourNamespace));
 		if (its != nscache.end()) {
 			ns = its->second;
 			if (ns == NULL) {
@@ -133,7 +134,7 @@ Namespace::Entry* fastLookup(const char* ourNamespace, const char* name) {
 					return nullptr;
 				}
 				nscache.erase(its);
-				nscache.insert(nscache.end(), std::make_pair(ourNamespace, ns));
+				nscache.insert(nscache.end(), std::make_pair(StringTableEntry(ourNamespace), ns));
 			}
 		}
 		else {
@@ -143,14 +144,14 @@ Namespace::Entry* fastLookup(const char* ourNamespace, const char* name) {
 				Printf("Fatal: fastLookup FAILED (2/2)!");
 				return nullptr;
 			}
-			nscache.insert(nscache.end(), std::make_pair(ourNamespace, ns));
+			nscache.insert(nscache.end(), std::make_pair(StringTableEntry(ourNamespace), ns));
 		}
 	}
 
-	std::map<Identifier*, Namespace::Entry*>::iterator it;
-	Identifier* lol = new Identifier();
-	lol->mName = name;
-	lol->mNamespace = ourNamespace;
+	std::map<std::string, Namespace::Entry*>::iterator it;
+	std::string lol(ourNamespace);
+	lol.append("__");
+	lol.append(name);
 	it = cache.find(lol); //Look into our Namespace::Entry* cache..
 	if (it != cache.end()) {
 		entry = it->second;
@@ -158,7 +159,6 @@ Namespace::Entry* fastLookup(const char* ourNamespace, const char* name) {
 			rewrite__fatal();
 			Printf("Fatal: found nullptr in cache!");
 			cache.erase(it); //Erase it so we don't encounter it again.
-			delete lol;
 			return nullptr;
 		}
 	}
@@ -166,7 +166,6 @@ Namespace::Entry* fastLookup(const char* ourNamespace, const char* name) {
 		entry = Namespace__lookup(ns, StringTableEntry(name));
 		if (entry == NULL) {
 			//Printf("Could not find function.");
-			delete lol;
 			return nullptr;
 		}
 		cache.insert(cache.end(), std::make_pair(lol, entry)); //Insert it so further calls are optimized.
