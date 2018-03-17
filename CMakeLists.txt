@@ -9,6 +9,7 @@ set(SOURCES
 	"source/bloader.cpp"
 	"source/dllmain.cpp"
 	"source/engine.cpp"
+	"source/filesystem.cpp"
 	"source/library.cpp"
 	"source/Torque.cpp"
 	)
@@ -16,7 +17,9 @@ set(SOURCES
 set(HEADERS
 	"include/blmodule.h"
 	"include/bloader.h"
+	"include/bloader.hpp"
 	"include/engine.h"
+	"include/filesystem.h"
 	"include/library.h"
 	"include/library_impl.h"
 	"include/Torque.h"
