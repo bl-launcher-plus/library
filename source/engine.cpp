@@ -2,6 +2,9 @@
 #include "blmodule.h"
 #include "blibrary.h"
 #include "Torque.h"
+#include "filesystem.h"
+
+#include <algorithm>
 
 // Empties and defaults
 static VoidCallback empty_void = [](SimObject *, int, const char*[]) {};
@@ -20,11 +23,27 @@ inline std::string safeCopyString(const char * cstr, int size)
 	return std::string(cstr, strnlen(cstr, size - 1));
 }
 
+char lowerChar(char in)
+{
+	if (in >= 'A' && in <= 'Z')
+		return in - ('Z' - 'A');
+	return in;
+}
+
+inline std::string lowerString(const std::string & s)
+{
+	std::string str = s;
+	std::transform(str.begin(), str.begin(), str.begin(), lowerChar);
+	return str;
+}
+
 bool Engine::init()
 {
 	if (!torque_init())
 		return false;
-
+	// Load all the libraries for now
+	// TODO: Either make this optional, or make BLauncher 
+	loadLibraries();
 	return true;
 }
 bool Engine::destroy()
@@ -216,6 +235,40 @@ void * Engine::getSymbol(const blmodule * module, const std::string & func) cons
 		return nullptr;
 
 	return _module->library.symbol(func);
+}
+
+bool Engine::loadLibraries()
+{
+	std::string path("modules");
+	Filesystem folder;
+	// Load
+	if (!folder.load(path))
+	{
+		// Create
+		if (!Filesystem::createFolder(path))
+			return false;
+		// Load again
+		else if (!folder.load(path))
+			return false;
+	}
+
+	// Iterate all files
+	for (; folder.valid(); folder.next())
+	{
+		auto module = folder.get();
+		// We need to make sure it is a dll
+		// TODO: Maybe add some more robust system?
+		auto extp = module.find_last_of(".");
+		if (lowerString(module.substr(extp + 1)) != "dll")
+			continue;
+		module = module.substr(0, extp);
+
+		// Got the name, so load as module instead of library
+		loadModule(module);
+	}
+
+	folder.close();
+	return true;
 }
 
 int Engine::loadLibrary(const std::string & path)

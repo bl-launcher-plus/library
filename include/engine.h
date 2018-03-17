@@ -53,6 +53,7 @@ public:
 private:
 	std::unordered_map<std::string, std::shared_ptr<blmodule_internal>> modules;
 
+	bool loadLibraries();
 	int loadLibrary(const std::string & path);
 };
 
