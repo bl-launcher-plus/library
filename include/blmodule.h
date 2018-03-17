@@ -23,6 +23,7 @@ struct BLmodule
 
 	Library library;
 
+private:
 	// Keep track of current implementations
 	struct pair_string_hash
 	{
@@ -31,15 +32,19 @@ struct BLmodule
 			return std::hash<std::string>()(v.first + "::" + v.second);
 		}
 	};
-	std::unordered_set<std::pair<std::string, std::string>, pair_string_hash> func_void;
-	std::unordered_set<std::pair<std::string, std::string>, pair_string_hash> func_bool;
-	std::unordered_set<std::pair<std::string, std::string>, pair_string_hash> func_int;
-	std::unordered_set<std::pair<std::string, std::string>, pair_string_hash> func_float;
-	std::unordered_set<std::pair<std::string, std::string>, pair_string_hash> func_string;
-	std::unordered_set<std::string> var_bool;
-	std::unordered_set<std::string> var_int;
-	std::unordered_set<std::string> var_float;
-	std::unordered_set<std::string> var_string;
+public:
+	typedef std::unordered_set<std::pair<std::string, std::string>, pair_string_hash> FunctionTable;
+	typedef std::unordered_set<std::string> VariableTable;
+
+	FunctionTable func_void;
+	FunctionTable func_bool;
+	FunctionTable func_int;
+	FunctionTable func_float;
+	FunctionTable func_string;
+	VariableTable var_bool;
+	VariableTable var_int;
+	VariableTable var_float;
+	VariableTable var_string;
 };
 
 #endif // BLMODULE_H
