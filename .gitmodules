@@ -1,0 +1,3 @@
+[submodule "MologieDetours"]
+	path = MologieDetours
+	url = https://github.com/kimperator/MologieDetours.git

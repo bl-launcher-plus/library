@@ -42,8 +42,8 @@ inline std::string lowerString(const std::string & s)
 
 bool Engine::init()
 {
-	if (!torque_init())
-		return false;
+	// if (!torque_init())
+	//	return false;
 	// Load all the libraries for now
 	// TODO: Either make this optional, or make BLauncher 
 	loadLibraries();

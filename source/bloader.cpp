@@ -1,6 +1,7 @@
 #include "bloader.h"
 #include "Torque.h"
 #include "engine.h"
+#include "detours.h"
 
 Engine g_engine;
 

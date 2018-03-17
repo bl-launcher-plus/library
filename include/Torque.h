@@ -230,6 +230,7 @@ BLFUNC_EXTERN(bool, __thiscall, SimObject__registerObject, SimObject *this_);
 BLFUNC_EXTERN(void, __thiscall, SimObject__registerReference, SimObject *this_, SimObject **ptr);
 BLFUNC_EXTERN(void, __thiscall, SimObject__unregisterReference, SimObject *this_, SimObject **ptr);
 BLFUNC_EXTERN(ConsoleObject *, , AbstractClassRep_create_className, const char *className);
+BLFUNC_EXTERN(void, , Sim__init, void);
 
 //Scan for a function
 DWORD ScanFunc(const char* pattern, const char* mask);

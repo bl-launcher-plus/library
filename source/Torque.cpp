@@ -42,7 +42,7 @@ SimObject__unregisterReferenceFn SimObject__unregisterReference;
 AbstractClassRep_create_classNameFn AbstractClassRep_create_className;
 SetGlobalVariableFn SetGlobalVariable;
 GetGlobalVariableFn GetGlobalVariable;
-
+Sim__initFn Sim__init;
 
 //Namespace::addCommand overloads
 BLFUNC(void, __thiscall, AddStringCommand, Namespace *ns, const char* name, StringCallback cb, const char *usage, int minArgs, int maxArgs);
@@ -386,9 +386,11 @@ bool torque_init()
 	if (!Printf)
 		return false;
 
+	
 	ShapeNameHudOnRender = (ShapeNameHudOnRenderFn)ScanFunc("\x81\xec\x00\x00\x00\x00\x53\x8b\xd9\x8a\x83\xc9\x00\x00\x00\x84\xc0\x55\x56\x57\x89\x5c\x24\x14", "xx????xxxxxxxxxxxxxxxxxx");
 
 	//First find all the functions
+	BLSCAN(Sim__init, "\x56\x33\xF6\x57\x89\x35", "xxxxxx");
 	BLSCAN(initGame, "\x56\x68\x00\x00\x00\x00\x68\x00\x00\x00\x00\xE8\x00\x00\x00\x00\x6A\xFF", "xx????x????x????xx");
 	BLSCAN(LookupNamespace, "\x8B\x44\x24\x04\x85\xC0\x75\x05", "xxxxxxxx");
 	BLSCAN(StringTableInsert, "\x53\x8B\x5C\x24\x08\x55\x56\x57\x53", "xxxxxxxxx");

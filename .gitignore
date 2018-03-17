@@ -219,7 +219,6 @@ FakesAssemblies/
 _Pvt_Extensions
 *.zip
 CMakeCache.txt
-*.cmake
 CMakeFiles/*
 *.vcxproj
 *.sln
