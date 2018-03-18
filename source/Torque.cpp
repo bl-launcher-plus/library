@@ -88,7 +88,7 @@ Namespace::Entry* passThroughLookup(Namespace* ns, const char* name) {
 	it = cache.find(lol); //Look into our Namespace::Entry* cache..
 	if (it != cache.end()) {
 		entry = it->second;
-		if (entry == NULL) {
+		if (entry == nullptr) {
 			rewrite__fatal();
 			Printf("Fatal: found nullptr in cache!");
 			cache.erase(it); //Erase it so we don't encounter it again.
@@ -97,7 +97,7 @@ Namespace::Entry* passThroughLookup(Namespace* ns, const char* name) {
 	}
 	else {
 		entry = Namespace__lookup(ns, name);
-		if (entry == NULL) {
+		if (entry == nullptr) {
 			//Printf("Could not find function.");
 			return nullptr;
 		}
@@ -111,8 +111,8 @@ Namespace::Entry* fastLookup(const char* ourNamespace, const char* name) {
 	Namespace::Entry* entry;
 
 	if (_stricmp(ourNamespace, "") == 0) { //If the namespace is blank, assume we're looking in the global namespace.
-		if (GlobalNS == NULL) {
-			GlobalNS = LookupNamespace(NULL);
+		if (GlobalNS == nullptr) {
+			GlobalNS = LookupNamespace(nullptr);
 		}
 		ns = GlobalNS;
 	}
@@ -121,10 +121,10 @@ Namespace::Entry* fastLookup(const char* ourNamespace, const char* name) {
 		its = nscache.find(StringTableEntry(ourNamespace));
 		if (its != nscache.end()) {
 			ns = its->second;
-			if (ns == NULL) {
+			if (ns == nullptr) {
 				//Somehow it got nullptr'd..
 				ns = LookupNamespace(ourNamespace);
-				if (ns == NULL) {
+				if (ns == nullptr) {
 					//THIS SHOULD NEVER HAPPEN!
 					rewrite__fatal();
 					Printf("Fatal: Found cached NS entry with nullptr, could not find namespace!");
@@ -137,7 +137,7 @@ Namespace::Entry* fastLookup(const char* ourNamespace, const char* name) {
 		}
 		else {
 			ns = LookupNamespace(StringTableEntry(ourNamespace));
-			if (ns == NULL) {
+			if (ns == nullptr) {
 				rewrite__fatal();
 				Printf("Fatal: fastLookup FAILED (2/2)!");
 				return nullptr;
@@ -153,7 +153,7 @@ Namespace::Entry* fastLookup(const char* ourNamespace, const char* name) {
 	it = cache.find(lol); //Look into our Namespace::Entry* cache..
 	if (it != cache.end()) {
 		entry = it->second;
-		if (entry == NULL) {
+		if (entry == nullptr) {
 			rewrite__fatal();
 			Printf("Fatal: found nullptr in cache!");
 			cache.erase(it); //Erase it so we don't encounter it again.
@@ -162,7 +162,7 @@ Namespace::Entry* fastLookup(const char* ourNamespace, const char* name) {
 	}
 	else {
 		entry = Namespace__lookup(ns, StringTableEntry(name));
-		if (entry == NULL) {
+		if (entry == nullptr) {
 			//Printf("Could not find function.");
 			return nullptr;
 		}
@@ -173,7 +173,7 @@ Namespace::Entry* fastLookup(const char* ourNamespace, const char* name) {
 }
 
 void* ts__fastCall(Namespace::Entry* ourCall, SimObject* obj, unsigned argc, ...) {
-	if (ourCall == NULL) {
+	if (ourCall == nullptr) {
 		Printf("Invalid entry.");
 		return nullptr;
 	}
@@ -209,8 +209,8 @@ void* ts__fastCall(Namespace::Entry* ourCall, SimObject* obj, unsigned argc, ...
 		return nullptr;
 	}
 	SimObject* actualObj;
-	if (obj == NULL) {
-		actualObj = NULL;
+	if (obj == nullptr) {
+		actualObj = nullptr;
 	}
 	else
 	{
@@ -256,7 +256,7 @@ void InitScanner()
 }
 
 //Compare data at two locations for equality
-bool CompareData(PBYTE data, PBYTE pattern, char* mask)
+bool CompareData(PBYTE data, PBYTE pattern, const char* mask)
 {
 	//Iterate over the data, pattern and mask in parallel
 	for (; *mask; ++data, ++pattern, ++mask)
@@ -266,11 +266,11 @@ bool CompareData(PBYTE data, PBYTE pattern, char* mask)
 			return false;
 	}
 
-	return (*mask) == NULL;
+	return (*mask) == 0;
 }
 
 //Find a pattern in memory
-DWORD FindPattern(DWORD imageBase, DWORD imageSize, PBYTE pattern, char* mask)
+DWORD FindPattern(DWORD imageBase, DWORD imageSize, PBYTE pattern, const char* mask)
 {
 	//Iterate over the image
 	for (DWORD i = imageBase; i < imageBase + imageSize; i++)
@@ -287,7 +287,7 @@ DWORD FindPattern(DWORD imageBase, DWORD imageSize, PBYTE pattern, char* mask)
 DWORD ScanFunc(const char* pattern, const char* mask)
 {
 	//Just search for the pattern in the module
-	return FindPattern(ImageBase, ImageSize - strlen(mask), (PBYTE)pattern, (char*)mask);
+	return FindPattern(ImageBase, ImageSize - strlen(mask), (PBYTE)pattern, mask);
 }
 
 //Change a byte at a specific location in memory
@@ -371,7 +371,7 @@ void ConsoleVariable(const char* name, char* data)
 //Evaluate a torquescript string in global scope
 const char* Eval(const char* str)
 {
-	return Evaluate(str, false, NULL);
+	return Evaluate(str, false, nullptr);
 }
 
 //Initialize the Torque Interface
