@@ -7,8 +7,8 @@ include(MologieDetours.cmake)
 # The name of the project
 set(LIB_NAME BLoader)
 
+# The libraries to load
 set(LIBRARIES 
-	${LIB_NAME}
 	"MologieDetours"
 	)
 
@@ -38,6 +38,11 @@ set(HEADERS
 include_directories("include/")
 include_directories("project/")
 
+# Multi threaded
+if(MSVC)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
+endif()
+
 # Make sure functions are exported
 add_definitions(-DBLOADER_DLL=1)
 
@@ -45,4 +50,4 @@ add_definitions(-DBLOADER_DLL=1)
 add_library(${LIB_NAME} SHARED ${SOURCES} ${HEADERS})
 
 # Link the library with more libraries, if needed
-target_link_libraries(${LIBRARIES})
+target_link_libraries(${LIB_NAME} ${LIBRARIES})
