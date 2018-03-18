@@ -1,7 +1,7 @@
 #include "bloader.h"
-#include "Torque.h"
 #include "engine.h"
-#include "detours.h"
+
+#include <stdarg.h>
 
 Engine g_engine;
 
@@ -9,11 +9,11 @@ Engine g_engine;
 bool bloader_init()
 {
 	if(g_engine.init()) {
-		Printf("BLoader %s loaded successfully.", bloader_versionString());
+		g_engine.info("BLoader %s loaded successfully.", bloader_versionString());
 		return true;
 	}
 	else {
-		Printf("BLoader failed to initialize.");
+		g_engine.info("BLoader failed to initialize.");
 		return false;
 	}
 }
@@ -22,11 +22,11 @@ bool bloader_init()
 bool bloader_destroy()
 {
 	if(g_engine.destroy()) {
-		Printf("BLoader %s unloaded successfully.", bloader_versionString());
+		g_engine.info("BLoader %s unloaded successfully.", bloader_versionString());
 		return true;
 	}
 	else {
-		Printf("Bloader failed to unload.");
+		g_engine.info("Bloader failed to unload.");
 		return false;
 	}
 }
@@ -169,6 +169,39 @@ const char * bloader_getVariable(const char * name)
 void bloader_setVariable(const char * name, const char * value)
 {
 	g_engine.setGlobalVariable(name, value);
+}
+
+int bloader_printf(const char * format, ...)
+{
+	va_list list;
+	va_start(list, format);
+	auto ret = g_engine.vprintf(format, list);
+	va_end(list);
+	return ret;
+}
+int bloader_info(const char * format, ...)
+{
+	va_list list;
+	va_start(list, format);
+	auto ret = g_engine.vinfo(format, list);
+	va_end(list);
+	return ret;
+}
+int bloader_warn(const char * format, ...)
+{
+	va_list list;
+	va_start(list, format);
+	auto ret = g_engine.vwarn(format, list);
+	va_end(list);
+	return ret;
+}
+int bloader_error(const char * format, ...)
+{
+	va_list list;
+	va_start(list, format);
+	auto ret = g_engine.verror(format, list);
+	va_end(list);
+	return ret;
 }
 
 void * bloader_symbol(const blmodule * module, const char * func)

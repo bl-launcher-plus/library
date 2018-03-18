@@ -5,6 +5,7 @@
 #include "filesystem.h"
 
 #include <algorithm>
+#include <cstring>
 
 // Empties and defaults
 static VoidCallback empty_void = [](SimObject *, int, const char*[]) {};
@@ -251,6 +252,107 @@ void Engine::setGlobalVariable(const char * name, const char * value)
 	SetGlobalVariable(name, value);
 }
 
+// Print a normal text to the engine
+int Engine::printf(const char * format, ...)
+{
+	va_list list;
+	va_start(list, format);
+	auto size = vprintf(format, list);
+	va_end(list);
+
+	return size;
+}
+int Engine::vprintf(const char * format, void * _list)
+{
+	return _vprintf(0, format, _list);
+}
+// Print out information
+int Engine::info(const char * format, ...)
+{
+	va_list list;
+	va_start(list, format);
+	auto size = vinfo(format, list);
+	va_end(list);
+
+	return size;
+}
+int Engine::vinfo(const char * format, void * list)
+{
+	return _vprintf(BLOADER_CONSOLE_INFO, format, list);
+}
+// Print out warning
+int Engine::warn(const char * format, ...)
+{
+	va_list list;
+	va_start(list, format);
+	auto size = vwarn(format, list);
+	va_end(list);
+
+	return size;
+}
+int Engine::vwarn(const char * format, void * list)
+{
+	return _vprintf(BLOADER_CONSOLE_WARN, format, list);
+}
+// Print out error
+int Engine::error(const char * format, ...)
+{
+	va_list list;
+	va_start(list, format);
+	auto size = verror(format, list);
+	va_end(list);
+
+	return size;
+}
+int Engine::verror(const char * format, void * list)
+{
+	return _vprintf(BLOADER_CONSOLE_ERROR, format, list);
+}
+// Perfectly safe printing of limitless text into TorqueEngine
+// What could ever go wrong?
+int Engine::_vprintf(const char * code, const char * format, void * _list)
+{
+	va_list list = (va_list)_list;
+	va_list list2;
+	va_copy(list2, list);
+
+	// Buffer can be null iff count is 0
+	auto err = std::vsnprintf(0, 0, format, list2);
+
+	va_end(list2);
+
+	if (err < 0)
+		return err;
+	std::size_t size = err;
+	std::size_t code_size = code ? std::strlen(code) : 0;
+
+	// Prepare buffer
+	char * output = new char[size + 1];
+	output[size] = 0;
+
+	// Put everything into the buffer
+	std::vsnprintf(output, size + 1, format, list);
+
+	// Print out in parts to avoid overflow (Torque limit is 4096)
+	char buffer[4096] = { 0 };
+	std::size_t max = sizeof(buffer) - 1;
+	for (std::size_t i = 0; i < size; i += max - code_size)
+	{
+		auto cp = (std::min)(max, size - i);
+		// MS shit
+		if (code_size)
+			strncpy_s(buffer, sizeof(buffer), code, code_size);
+		strncpy_s(buffer + code_size, sizeof(buffer) - code_size, output + i, cp - code_size);
+		// Make sure last one is nullified
+		buffer[cp] = 0;
+		Printf(buffer);
+	}
+
+	delete output;
+
+	return size;
+}
+
 void * Engine::getSymbol(const blmodule * module, const std::string & func) const
 {
 	if (!module)
@@ -268,23 +370,23 @@ bool Engine::loadLibraries()
 	// Load
 	if (!folder.load(path))
 	{
-		Printf("BLoader: Unable to locate modules folder '%s', creating it", path.c_str());
+		warn("BLoader: Unable to locate modules folder '%s', creating it", path.c_str());
 		// Create
 		if (!Filesystem::createFolder(path))
 		{
-			Printf("BLoader: Unable to create modules folder");
+			error("BLoader: Unable to create modules folder");
 			return false;
 		}
 		// Load again
 		else if (!folder.load(path))
 		{
-			Printf("BLoader: Unable to load modules folder");
+			error("BLoader: Unable to load modules folder");
 			return false;
 		}
 	}
 
 	// Iterate all files
-	Printf("BLoader: loading modules.");
+	info("BLoader: loading modules.");
 
 	for (; folder.valid(); folder.next())
 	{
@@ -295,19 +397,19 @@ bool Engine::loadLibraries()
 		auto extp = module.find_last_of(".");
 		if (lowerString(module.substr(extp + 1)) != "dll")
 		{
-			Printf("BLoader: skipping %s because non-dll.", module.c_str());
+			warn("BLoader: skipping %s because non-dll.", module.c_str());
 			continue;
 		}
 
 		module = module.substr(0, extp);
-		Printf("BLoader: loading %s", module.c_str());
+		info("BLoader: loading %s", module.c_str());
 
 		// Got the name, so load as module instead of library
 		int status = loadModule(module);
 		if (status != BL_OK)
 		{
-			Printf("BLoader: Failed to load %s.", module.c_str());
-			Printf("Reason: %s", bloader_getError(status));
+			error("BLoader: Failed to load %s.", module.c_str());
+			warn("Reason: %s", bloader_getError(status));
 		}
 	}
 

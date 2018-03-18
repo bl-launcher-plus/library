@@ -49,6 +49,15 @@ public:
 	const char * getGlobalVariable(const char * name);
 	void setGlobalVariable(const char * name, const char * value);
 
+	int printf(const char * format, ...);
+	int vprintf(const char * format, void * list);
+	int info(const char * format, ...);
+	int vinfo(const char * format, void * list);
+	int warn(const char * format, ...);
+	int vwarn(const char * format, void * list);
+	int error(const char * format, ...);
+	int verror(const char * format, void * list);
+
 	// Library communications
 	void * getSymbol(const blmodule * module, const std::string & func) const;
 
@@ -58,6 +67,8 @@ private:
 
 	bool loadLibraries();
 	int loadLibrary(const std::string & path);
+
+	int _vprintf(const char * code, const char * format, void * list);
 };
 
 #endif // ENGINE_H
