@@ -132,9 +132,9 @@ BLOADER_EXPORT const char * bloader_getVariable(const char * name);
 BLOADER_EXPORT void bloader_setVariable(const char * name, const char * value);
 
 BLOADER_EXPORT int bloader_printf(const char * format, ...);
-BLOADER_EXPORT int bloader_info(const char * format, ...);
-BLOADER_EXPORT int bloader_warn(const char * format, ...);
-BLOADER_EXPORT int bloader_error(const char * format, ...);
+BLOADER_EXPORT int bloader_printf_info(const char * format, ...);
+BLOADER_EXPORT int bloader_printf_warn(const char * format, ...);
+BLOADER_EXPORT int bloader_printf_error(const char * format, ...);
 
 /*
  * Interface for other libraries

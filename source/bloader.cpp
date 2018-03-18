@@ -179,7 +179,7 @@ int bloader_printf(const char * format, ...)
 	va_end(list);
 	return ret;
 }
-int bloader_info(const char * format, ...)
+int bloader_printf_info(const char * format, ...)
 {
 	va_list list;
 	va_start(list, format);
@@ -187,7 +187,7 @@ int bloader_info(const char * format, ...)
 	va_end(list);
 	return ret;
 }
-int bloader_warn(const char * format, ...)
+int bloader_printf_warn(const char * format, ...)
 {
 	va_list list;
 	va_start(list, format);
@@ -195,7 +195,7 @@ int bloader_warn(const char * format, ...)
 	va_end(list);
 	return ret;
 }
-int bloader_error(const char * format, ...)
+int bloader_printf_error(const char * format, ...)
 {
 	va_list list;
 	va_start(list, format);
