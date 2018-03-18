@@ -42,6 +42,8 @@ inline std::string lowerString(const std::string & s)
 
 bool Engine::init()
 {
+	currDir = Filesystem::getCurrentModuleDirectory();
+
 	// Load all the libraries for now
 	// TODO: Either make this optional, or make BLauncher 
 	return loadLibraries();
@@ -138,7 +140,7 @@ int Engine::moduleExist(const std::string & name) const
 	if (it != modules.end())
 		return BL_OK;
 	// Check if found in filesystem
-	std::string path = std::string("modules/") + std::string(name) + std::string(".dll");
+	std::string path = currDir + std::string("/modules/") + std::string(name) + std::string(".dll");
 	return Filesystem::exists(path) ? BL_OK : BL_INVALID_LIBRARY;
 }
 
@@ -261,17 +263,24 @@ void * Engine::getSymbol(const blmodule * module, const std::string & func) cons
 
 bool Engine::loadLibraries()
 {
-	std::string path("modules");
+	std::string path(currDir + "/modules");
 	Filesystem folder;
 	// Load
 	if (!folder.load(path))
 	{
+		Printf("BLoader: Unable to locate modules folder '%s', creating it", path.c_str());
 		// Create
 		if (!Filesystem::createFolder(path))
+		{
+			Printf("BLoader: Unable to create modules folder");
 			return false;
+		}
 		// Load again
 		else if (!folder.load(path))
+		{
+			Printf("BLoader: Unable to load modules folder");
 			return false;
+		}
 	}
 
 	// Iterate all files
@@ -311,7 +320,7 @@ int Engine::loadLibrary(const std::string & name)
 	if (name.empty())
 		return BL_INVALID_POINTER;
 
-	std::string path = std::string("modules/") + std::string(name) + std::string(".dll");
+	std::string path = currDir + std::string("/modules/") + std::string(name) + std::string(".dll");
 
 	// Load library
 	Library lib;

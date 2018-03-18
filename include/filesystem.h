@@ -30,6 +30,9 @@ public:
 
 	static bool exists(const std::string & path);
 
+	static std::string getCurrentDirectory();
+	static std::string getCurrentModuleDirectory();
+
 private:
 	struct filesystem_impl * impl;
 };

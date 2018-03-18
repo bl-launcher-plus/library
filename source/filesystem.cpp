@@ -81,3 +81,34 @@ bool Filesystem::exists(const std::string & path)
 		FindClose(search.hFind);
 	return found;
 }
+
+std::string Filesystem::getCurrentDirectory()
+{
+	std::string path;
+	DWORD copied = 0;
+	do
+	{
+		path.resize(path.size() + MAX_PATH);
+		copied = GetCurrentDirectoryA(path.size(), &path.at(0));
+	} while (copied >= path.size());
+	path.resize(copied);
+
+	return path;
+}
+
+std::string Filesystem::getCurrentModuleDirectory()
+{
+	std::string path;
+	DWORD copied = 0;
+	do
+	{
+		path.resize(path.size() + MAX_PATH);
+		copied = GetModuleFileNameA(NULL, &path.at(0), path.size());
+	} while (copied >= path.size());
+	path.resize(copied);
+
+	auto found = path.find_last_of('/');
+	if (found == std::string::npos)
+		found = path.find_last_of('\\');
+	return path.substr(0, found);
+}

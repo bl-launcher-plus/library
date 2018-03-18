@@ -54,6 +54,7 @@ public:
 
 private:
 	std::unordered_map<std::string, std::shared_ptr<blmodule>> modules;
+	std::string currDir;
 
 	bool loadLibraries();
 	int loadLibrary(const std::string & path);
