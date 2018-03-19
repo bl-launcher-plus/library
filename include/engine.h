@@ -12,7 +12,7 @@ class Engine
 {
 public:
 	// Engine initialization and destruction
-	bool init();
+	bool init(std::shared_ptr<class TorqueEngine> torque);
 	bool destroy();
 
 	// Module loading and unloading
@@ -64,6 +64,8 @@ public:
 private:
 	std::unordered_map<std::string, std::shared_ptr<blmodule>> modules;
 	std::string currDir;
+
+	std::shared_ptr<class TorqueEngine> torque;
 
 	bool loadLibraries();
 	int loadLibrary(const std::string & path);

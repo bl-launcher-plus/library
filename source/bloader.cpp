@@ -2,13 +2,14 @@
 #include "engine.h"
 
 #include <stdarg.h>
+#include <memory>
 
 Engine g_engine;
 
 // Initializating engine
-bool bloader_init()
+bool bloader_init(std::shared_ptr<class TorqueEngine> torque)
 {
-	if(g_engine.init()) {
+	if(g_engine.init(torque)) {
 		g_engine.info("BLoader %s loaded successfully.", bloader_versionString());
 		return true;
 	}

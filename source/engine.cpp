@@ -1,11 +1,13 @@
 #include "engine.h"
 #include "blmodule.h"
 #include "blibrary.h"
-#include "Torque.h"
 #include "filesystem.h"
+
+#include "torque/torque.h"
 
 #include <algorithm>
 #include <cstring>
+#include <stdarg.h>
 
 // Empties and defaults
 static VoidCallback empty_void = [](SimObject *, int, const char*[]) {};
@@ -41,9 +43,11 @@ inline std::string lowerString(const std::string & s)
 	return str;
 }
 
-bool Engine::init()
+bool Engine::init(std::shared_ptr<class TorqueEngine> _torque)
 {
 	currDir = Filesystem::getCurrentModuleDirectory();
+
+	torque = _torque;
 
 	// Load all the libraries for now
 	// TODO: Either make this optional, or make BLauncher 
@@ -54,6 +58,8 @@ bool Engine::destroy()
 	// Just clear them. No need to unlink the connection as it is already destroyed
 	// The rest is handled automatically
 	modules.clear();
+
+	torque.reset();
 	return true;
 }
 
@@ -77,24 +83,24 @@ int Engine::unloadModule(const std::string & name)
 	auto module = it->second;
 	// Make all functions and variables invalid
 	for (const auto & func : module->func_void)
-		ConsoleFunction(func.first.c_str(), func.second.c_str(), empty_void, "", 0, 0);
+		torque->ConsoleFunction(func.first.c_str(), func.second.c_str(), empty_void, "", 0, 0);
 	for (const auto & func : module->func_bool)
-		ConsoleFunction(func.first.c_str(), func.second.c_str(), empty_bool, "", 0, 0);
+		torque->ConsoleFunction(func.first.c_str(), func.second.c_str(), empty_bool, "", 0, 0);
 	for (const auto & func : module->func_int)
-		ConsoleFunction(func.first.c_str(), func.second.c_str(), empty_int, "", 0, 0);
+		torque->ConsoleFunction(func.first.c_str(), func.second.c_str(), empty_int, "", 0, 0);
 	for (const auto & func : module->func_float)
-		ConsoleFunction(func.first.c_str(), func.second.c_str(), empty_float, "", 0, 0);
+		torque->ConsoleFunction(func.first.c_str(), func.second.c_str(), empty_float, "", 0, 0);
 	for (const auto & func : module->func_string)
-		ConsoleFunction(func.first.c_str(), func.second.c_str(), empty_string, "", 0, 0);
+		torque->ConsoleFunction(func.first.c_str(), func.second.c_str(), empty_string, "", 0, 0);
 
 	for (const auto & var : module->var_bool)
-		ConsoleVariable(var.c_str(), &default_bool);
+		torque->ConsoleVariable(var.c_str(), &default_bool);
 	for (const auto & var : module->var_int)
-		ConsoleVariable(var.c_str(), &default_int);
+		torque->ConsoleVariable(var.c_str(), &default_int);
 	for (const auto & var : module->var_float)
-		ConsoleVariable(var.c_str(), &default_float);
+		torque->ConsoleVariable(var.c_str(), &default_float);
 	for (const auto & var : module->var_string)
-		ConsoleVariable(var.c_str(), default_string);
+		torque->ConsoleVariable(var.c_str(), default_string);
 
 	// Unload the library
 	module->library.unload();
@@ -179,7 +185,7 @@ void Engine::consoleFunction(blmodule * module, const char * nameSpace, const ch
 	if (!module)
 		return;
 	module->func_void.emplace(std::make_pair(nameSpace, name));
-	ConsoleFunction(nameSpace, name, (VoidCallback)callback, usage, minArgs, maxArgs);
+	torque->ConsoleFunction(nameSpace, name, (VoidCallback)callback, usage, minArgs, maxArgs);
 }
 void Engine::consoleFunction(blmodule * module, const char * nameSpace, const char * name,
 	bl_callback_bool callback, const char * usage, int minArgs, int maxArgs)
@@ -187,7 +193,7 @@ void Engine::consoleFunction(blmodule * module, const char * nameSpace, const ch
 	if (!module)
 		return;
 	module->func_void.emplace(std::make_pair(nameSpace, name));
-	ConsoleFunction(nameSpace, name, (BoolCallback)callback, usage, minArgs, maxArgs);
+	torque->ConsoleFunction(nameSpace, name, (BoolCallback)callback, usage, minArgs, maxArgs);
 }
 void Engine::consoleFunction(blmodule * module, const char * nameSpace, const char * name,
 	bl_callback_int callback, const char * usage, int minArgs, int maxArgs)
@@ -195,7 +201,7 @@ void Engine::consoleFunction(blmodule * module, const char * nameSpace, const ch
 	if (!module)
 		return;
 	module->func_void.emplace(std::make_pair(nameSpace, name));
-	ConsoleFunction(nameSpace, name, (IntCallback)callback, usage, minArgs, maxArgs);
+	torque->ConsoleFunction(nameSpace, name, (IntCallback)callback, usage, minArgs, maxArgs);
 }
 void Engine::consoleFunction(blmodule * module, const char * nameSpace, const char * name,
 	bl_callback_float callback, const char * usage, int minArgs, int maxArgs)
@@ -203,7 +209,7 @@ void Engine::consoleFunction(blmodule * module, const char * nameSpace, const ch
 	if (!module)
 		return;
 	module->func_void.emplace(std::make_pair(nameSpace, name));
-	ConsoleFunction(nameSpace, name, (FloatCallback)callback, usage, minArgs, maxArgs);
+	torque->ConsoleFunction(nameSpace, name, (FloatCallback)callback, usage, minArgs, maxArgs);
 }
 void Engine::consoleFunction(blmodule * module, const char * nameSpace, const char * name,
 	bl_callback_string callback, const char * usage, int minArgs, int maxArgs)
@@ -211,7 +217,7 @@ void Engine::consoleFunction(blmodule * module, const char * nameSpace, const ch
 	if (!module)
 		return;
 	module->func_void.emplace(std::make_pair(nameSpace, name));
-	ConsoleFunction(nameSpace, name, (StringCallback)callback, usage, minArgs, maxArgs);
+	torque->ConsoleFunction(nameSpace, name, (StringCallback)callback, usage, minArgs, maxArgs);
 }
 
 void Engine::consoleVariable(blmodule * module, const char * name, bool * var)
@@ -219,28 +225,28 @@ void Engine::consoleVariable(blmodule * module, const char * name, bool * var)
 	if (!module)
 		return;
 	module->var_bool.emplace(name);
-	ConsoleVariable(name, var);
+	torque->ConsoleVariable(name, var);
 }
 void Engine::consoleVariable(blmodule * module, const char * name, int * var)
 {
 	if (!module)
 		return;
 	module->var_int.emplace(name);
-	ConsoleVariable(name, var);
+	torque->ConsoleVariable(name, var);
 }
 void Engine::consoleVariable(blmodule * module, const char * name, float * var)
 {
 	if (!module)
 		return;
 	module->var_float.emplace(name);
-	ConsoleVariable(name, var);
+	torque->ConsoleVariable(name, var);
 }
 void Engine::consoleVariable(blmodule * module, const char * name, char * var)
 {
 	if (!module)
 		return;
 	module->var_string.emplace(name);
-	ConsoleVariable(name, var);
+	torque->ConsoleVariable(name, var);
 }
 
 const char * Engine::getGlobalVariable(const char * name)

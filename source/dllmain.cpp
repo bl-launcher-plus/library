@@ -1,10 +1,13 @@
 #include <windows.h>
-#include "Torque.h"
+#include <memory>
+#include "torque/torque.h"
 #include "detours.h"
 
 // Direct reference to bloader.cpp
-bool bloader_init();
+bool bloader_init(std::shared_ptr<class TorqueEngine> torque);
 bool bloader_destroy();
+
+std::shared_ptr<TorqueEngine> g_torque;
 
 // TODO: Somehow move this somewhere else where it wont be in the way
 
@@ -16,7 +19,7 @@ void Sim__init_hook(void)
 {
 	// This is loaded here to make sure no output is made within the DLL
 	// before it is actually loaded.
-	bloader_init();
+	bloader_init(g_torque);
 
 	// All the original function
 	return Sim__init_detour->GetOriginalFunction()();
@@ -35,8 +38,10 @@ extern "C" __declspec(dllexport) BOOL WINAPI DllMain(HINSTANCE instance, DWORD r
 	{
 		DisableThreadLibraryCalls(instance);
 
+		g_torque = std::make_shared<TorqueEngine>();
+
 		// Initialize torque with all what it means
-		if (!torque_init())
+		if (!g_torque->init())
 			return FALSE;
 
 		// Squeeze in our function
