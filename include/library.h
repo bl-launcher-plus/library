@@ -20,13 +20,15 @@ public:
 	template<typename T>
 	T * variable(const std::string & name) const
 	{
-		return static_cast<T *>(symbol(name));
+		return (T*)symbol(name);
+		//return static_cast<T *>(symbol(name));
 	}
 	// Get a function
 	template<typename T>
 	std::function<T> functionex(const std::string & name) const
 	{
-		return static_cast<T *>(symbol(name.c_str()));
+		return (T*)symbol(name);
+		//return static_cast<T *>(symbol(name.c_str()));
 	}
 	// Helper macro for easier fetching a function
 #define function(func) functionex<decltype(func)>(std::string(#func))

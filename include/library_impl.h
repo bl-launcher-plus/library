@@ -20,7 +20,7 @@ typedef decltype(LoadLibraryEx(0, 0, 0)) libtype;
 
 inline auto libload(const std::string & path) -> libtype
 {
-	return LoadLibraryEx(path.c_str(), NULL, DONT_RESOLVE_DLL_REFERENCES);
+	return (HMODULE)LoadLibraryEx(path.c_str(), NULL, DONT_RESOLVE_DLL_REFERENCES);
 }
 inline auto libunload(libtype lib)
 {
@@ -95,16 +95,9 @@ inline void libreset(libtype)
 #endif
 
 // Get a function from a library and convert it
-template<typename T>
-std::function<T> libfunctionex(const decltype(lib_impl::lib) lib, const char * func)
-{
-	return (T *)libsymbol(lib, func);
-}
-// Get a function and convert it
-#define libfunction(lib, func) libfunctionex<decltype(func)>((lib), #func)
-
 // Implementation for a library
 // It does not check if a libray is already loaded. It is as default as it can get
+//
 class lib_impl
 {
 public:
@@ -131,7 +124,11 @@ public:
 	{
 		return libsymbol(lib, name);
 	}
-	// Get a function
+	template<typename T>
+	std::function<T> libfunctionex(const HMODULE lib, const char * func)
+	{
+		return (T *)libsymbol(lib, func);
+	}// Get a function
 	template<typename T>
 	auto functionex(const std::string & name) const -> decltype(libfunctionex<T>(0, 0))
 	{
@@ -151,11 +148,16 @@ public:
 	{
 		return liberror(lib);
 	}
-
+	
 	// Check if library is loaded
 	inline operator bool() const { return !!lib; }
 private:
-	decltype(libload(0)) lib = decltype(lib)();
+	HMODULE lib;
 };
+
+
+
+// Get a function and convert it
+#define libfunction(lib, func) libfunctionex<decltype(func)>((lib), #func)
 
 #endif // LIBRARY_IMPL_H

@@ -1,6 +1,6 @@
 #include "scanner.h"
 #include <windows.h>
-#include <Psapi.h>
+#include <psapi.h>
 
 struct scanner_impl
 {

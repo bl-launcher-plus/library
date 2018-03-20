@@ -4,6 +4,7 @@
 
 #include <unordered_set>
 #include <string>
+#include <cstring>
 
 #include "blibrary.h"
 #include "library.h"

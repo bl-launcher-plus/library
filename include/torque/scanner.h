@@ -20,7 +20,7 @@ public:
 	template<typename T>
 	T locateFunction(const char * pattern, const char * mask)
 	{
-		return static_cast<T>(findFunction(pattern, mask));
+		(T)(findFunction(pattern, mask));
 	}
 
 private:

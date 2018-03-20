@@ -1,5 +1,6 @@
 #include "torque.h"
 
+#include <windows.h>
 #include <stdarg.h>
 
 void TorqueEngine::rewrite__fatal() {
