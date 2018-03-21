@@ -169,42 +169,45 @@ void* TorqueEngine::ts__fastCall(Namespace::Entry* ourCall, SimObject* obj, unsi
 
 const char * TorqueEngine::StringTableEntry(const char * str, bool caseSensitive)
 {
-	return StringTableInsert(StringTable, str, caseSensitive);
+	// Make sure it is allocated
+	if (!*StringTable)
+		return "";
+	return StringTableInsert(*StringTable, str, caseSensitive);
 }
 
 //Register a torquescript function that returns a string. The function must look like this:
 //const char* func(DWORD* obj, int argc, const char* argv[])
 void TorqueEngine::ConsoleFunction(const char* nameSpace, const char* name, StringCallback callBack, const char* usage, int minArgs, int maxArgs)
 {
-	AddStringCommand(LookupNamespace(nameSpace), StringTableInsert(StringTable, name, false), callBack, usage, minArgs, maxArgs);
+	AddStringCommand(LookupNamespace(nameSpace), StringTableEntry(name, false), callBack, usage, minArgs, maxArgs);
 }
 
 //Register a torquescript function that returns an int. The function must look like this:
 //int func(DWORD* obj, int argc, const char* argv[])
 void TorqueEngine::ConsoleFunction(const char* nameSpace, const char* name, IntCallback callBack, const char* usage, int minArgs, int maxArgs)
 {
-	AddIntCommand(LookupNamespace(nameSpace), StringTableInsert(StringTable, name, false), callBack, usage, minArgs, maxArgs);
+	AddIntCommand(LookupNamespace(nameSpace), StringTableEntry(name, false), callBack, usage, minArgs, maxArgs);
 }
 
 //Register a torquescript function that returns a float. The function must look like this:
 //float func(DWORD* obj, int argc, const char* argv[])
 void TorqueEngine::ConsoleFunction(const char* nameSpace, const char* name, FloatCallback callBack, const char* usage, int minArgs, int maxArgs)
 {
-	AddFloatCommand(LookupNamespace(nameSpace), StringTableInsert(StringTable, name, false), callBack, usage, minArgs, maxArgs);
+	AddFloatCommand(LookupNamespace(nameSpace), StringTableEntry(name, false), callBack, usage, minArgs, maxArgs);
 }
 
 //Register a torquescript function that returns nothing. The function must look like this:
 //void func(DWORD* obj, int argc, const char* argv[])
 void TorqueEngine::ConsoleFunction(const char* nameSpace, const char* name, VoidCallback callBack, const char* usage, int minArgs, int maxArgs)
 {
-	AddVoidCommand(LookupNamespace(nameSpace), StringTableInsert(StringTable, name, false), callBack, usage, minArgs, maxArgs);
+	AddVoidCommand(LookupNamespace(nameSpace), StringTableEntry(name, false), callBack, usage, minArgs, maxArgs);
 }
 
 //Register a torquescript function that returns a bool. The function must look like this:
 //bool func(DWORD* obj, int argc, const char* argv[])
 void TorqueEngine::ConsoleFunction(const char* nameSpace, const char* name, BoolCallback callBack, const char* usage, int minArgs, int maxArgs)
 {
-	AddBoolCommand(LookupNamespace(nameSpace), StringTableInsert(StringTable, name, false), callBack, usage, minArgs, maxArgs);
+	AddBoolCommand(LookupNamespace(nameSpace), StringTableEntry(name, false), callBack, usage, minArgs, maxArgs);
 }
 
 //Expose an integer variable to torquescript

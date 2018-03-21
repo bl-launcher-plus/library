@@ -71,10 +71,11 @@ bool TorqueEngine::init()
 
 	// since it's so small we need a long sig
 	// The string table is used in lookupnamespace so we can get it's location
-	StringTable = (void *)(*(DWORD*)(*(DWORD*)((DWORD)LookupNamespace + 15)));
+	// Note: Due to that it may be allocated later on, we will only retrieve the address to the variable storing the object
+	StringTable = (void **)(*(DWORD**)((DWORD)LookupNamespace + 15));
 
 	// Get the global variable dictionary pointer
-	GlobalVars = (void *)(*(DWORD*)(scanner.locateFunction<void *>("\x8B\x44\x24\x0C\x8B\x4C\x24\x04\x50\x6A\x06", "xxxxxxxxxxx")) + 13);
+	GlobalVars = (void *)(*(DWORD*)(scanner.locateFunction<DWORD>("\x8B\x44\x24\x0C\x8B\x4C\x24\x04\x50\x6A\x06", "xxxxxxxxxxx") + 13));
 
 #undef BLSCAN
 	return true;

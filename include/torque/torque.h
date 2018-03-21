@@ -47,7 +47,7 @@ private:
 	std::map<const char*, Namespace*> nscache;
 	Namespace* GlobalNS = nullptr;
 
-	void * StringTable = nullptr; // StringTable pointer
+	void ** StringTable = nullptr; // StringTable pointer
 	void * GlobalVars = nullptr; // global variable dictionary pointer
 
 	// Namespace::addCommand overloads
