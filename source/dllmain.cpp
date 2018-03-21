@@ -21,6 +21,8 @@ void Sim__init_hook(void)
 	// before it is actually loaded.
 	bloader_init(g_torque);
 
+
+	
 	// All the original function
 	return Sim__init_detour->GetOriginalFunction()();
 }

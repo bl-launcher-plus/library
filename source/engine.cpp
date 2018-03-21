@@ -323,7 +323,7 @@ int Engine::_vprintf(const char * code, const char * format, void * _list)
 	va_copy(list2, list);
 
 	// Buffer can be null iff count is 0
-	auto err = std::vsnprintf(0, 0, format, list2);
+	auto err = std::vsnprintf(0, 0, format, list2) + 1;
 
 	va_end(list2);
 
@@ -341,16 +341,18 @@ int Engine::_vprintf(const char * code, const char * format, void * _list)
 
 	// Print out in parts to avoid overflow (Torque limit is 4096)
 	char buffer[4096] = { 0 };
-	std::size_t max = sizeof(buffer) - 1;
+	std::size_t max = 4095;
 	for (std::size_t i = 0; i <= size; i += max - code_size)
 	{
+		//Printf("%d %d", max, size - i);
+		//Printf("%d", i);
 		auto cp = (std::min)(max, size - i);
 		// MS shit
 		if (code_size)
 			strncpy_s(buffer, sizeof(buffer), code, code_size);
 		strncpy_s(buffer + code_size, sizeof(buffer) - code_size, output + i, cp - code_size);
 		// Make sure last one is nullified
-		buffer[cp] = 0;
+		//buffer[cp] = 0;
 		Printf(buffer);
 	}
 

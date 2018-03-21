@@ -20,7 +20,8 @@ typedef decltype(LoadLibraryEx(0, 0, 0)) libtype;
 
 inline auto libload(const std::string & path) -> libtype
 {
-	return (HMODULE)LoadLibraryEx(path.c_str(), NULL, DONT_RESOLVE_DLL_REFERENCES);
+	//return LoadLibrary(path.c_str());
+	return LoadLibraryEx(path.c_str(), NULL, NULL);
 }
 inline auto libunload(libtype lib)
 {
