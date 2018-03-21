@@ -342,7 +342,7 @@ int Engine::_vprintf(const char * code, const char * format, void * _list)
 	// Print out in parts to avoid overflow (Torque limit is 4096)
 	char buffer[4096] = { 0 };
 	std::size_t max = sizeof(buffer) - 1;
-	for (std::size_t i = 0; i < size; i += max - code_size)
+	for (std::size_t i = 0; i <= size; i += max - code_size)
 	{
 		auto cp = (std::min)(max, size - i);
 		// MS shit
