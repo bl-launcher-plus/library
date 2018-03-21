@@ -18,7 +18,6 @@ struct BLmodule
 	{
 		// Note: This is not that secure, but it works
 		memset(&info, 0, sizeof(info));
-		memset(&library, 0, sizeof(library));
 	}
 
 	BLinfo info;

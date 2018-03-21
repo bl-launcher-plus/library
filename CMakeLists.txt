@@ -14,9 +14,10 @@ set(LIBRARIES
 	)
 
 # Activate C++14 on MingW cross-compiling situations.
-set (CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+
 # Sources and headers to be included in compilation
 set(SOURCES_TORQUE
 	"source/torque/functions.cpp"

@@ -20,8 +20,6 @@ void Sim__init_hook(void)
 	// This is loaded here to make sure no output is made within the DLL
 	// before it is actually loaded.
 	bloader_init(g_torque);
-
-
 	
 	// All the original function
 	return Sim__init_detour->GetOriginalFunction()();

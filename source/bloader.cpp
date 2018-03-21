@@ -10,7 +10,7 @@ Engine g_engine;
 bool bloader_init(std::shared_ptr<class TorqueEngine> torque)
 {
 	if(g_engine.init(torque)) {
-		g_engine.info("BLoader %s loaded successfully.", bloader_versionString());	
+		g_engine.info("BLoader %s loaded successfully.", bloader_versionString());
 		return true;
 	}
 	else {

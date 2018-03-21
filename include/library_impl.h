@@ -16,12 +16,11 @@
 #if defined(_WIN32)
 #include <windows.h>
 
-typedef decltype(LoadLibraryEx(0, 0, 0)) libtype;
+typedef decltype(LoadLibraryExA(0, 0, 0)) libtype;
 
 inline auto libload(const std::string & path) -> libtype
 {
-	//return LoadLibrary(path.c_str());
-	return LoadLibraryEx(path.c_str(), NULL, NULL);
+	return LoadLibraryExA(path.c_str(), NULL, NULL);
 }
 inline auto libunload(libtype lib)
 {
@@ -96,6 +95,15 @@ inline void libreset(libtype)
 #endif
 
 // Get a function from a library and convert it
+template<typename T>
+std::function<T> libfunctionex(const libtype lib, const char * func)
+{
+	return (T *)libsymbol(lib, func);
+}
+
+// Get a function and convert it
+#define libfunction(lib, func) libfunctionex<decltype(func)>((lib), #func)
+
 // Implementation for a library
 // It does not check if a libray is already loaded. It is as default as it can get
 //
@@ -125,11 +133,7 @@ public:
 	{
 		return libsymbol(lib, name);
 	}
-	template<typename T>
-	std::function<T> libfunctionex(const HMODULE lib, const char * func)
-	{
-		return (T *)libsymbol(lib, func);
-	}// Get a function
+	// Get a function
 	template<typename T>
 	auto functionex(const std::string & name) const -> decltype(libfunctionex<T>(0, 0))
 	{
@@ -153,12 +157,7 @@ public:
 	// Check if library is loaded
 	inline operator bool() const { return !!lib; }
 private:
-	HMODULE lib;
+	libtype lib;
 };
-
-
-
-// Get a function and convert it
-#define libfunction(lib, func) libfunctionex<decltype(func)>((lib), #func)
 
 #endif // LIBRARY_IMPL_H
