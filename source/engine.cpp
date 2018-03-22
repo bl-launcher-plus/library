@@ -82,13 +82,6 @@ int Engine::unloadModule(const std::string & name)
 
 	auto module = it->second;
 
-	auto deinit = module->library.function(blibrary_deinit);
-	if (deinit) {
-		deinit();
-	}
-	else {
-		bloader_printf_error("could not find a deinit function");
-	}
 	// Make all functions and variables invalid
 	for (const auto & func : module->func_void) {
 		const char* ns = func.first.c_str();
@@ -118,6 +111,15 @@ int Engine::unloadModule(const std::string & name)
 		torque->ConsoleVariable(var.c_str(), default_string);
 
 	// Unload the library
+
+	auto deinit = module->library.function(blibrary_deinit);
+	if (deinit) {
+		deinit();
+	}
+	else {
+		bloader_printf_error("could not find a deinit function");
+	}
+
 	module->library.unload();
 
 	// And remove

@@ -44,6 +44,7 @@ bool bloader_init(std::shared_ptr<class TorqueEngine> torque)
 	if(g_engine.init(torque)) {
 		g_engine.info("BLoader %s loaded successfully.", bloader_versionString());
 		
+
 		torque->ConsoleFunction(NULL, "unloadModule", bloader_ts_unloadModule, "(string moduleName) - Unload a module, replacing it's functions with blank templates.", 2, 2);
 		torque->ConsoleFunction(NULL, "loadModule", bloader_ts_loadModule, "(string moduleName) - Load a module, or reload it if it is already in.", 2, 2);
 		return true;
