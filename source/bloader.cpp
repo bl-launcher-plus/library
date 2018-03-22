@@ -1,16 +1,51 @@
 #include "bloader.h"
 #include "engine.h"
-
+#include "torque.h"
 #include <stdarg.h>
 #include <memory>
 
 Engine g_engine;
 
 // Initializating engine
+
+void bloader_ts_unloadModule(SimObject* this_, int argc, const char* argv[]) {
+	std::string module(argv[1]);
+	if (g_engine.moduleLoaded(module) == BL_OK) {
+		int err = g_engine.unloadModule(module);
+		if (err != BL_OK) {
+			bloader_printf_error("Error occured while unloading module: %s", bloader_getError(err));
+		}
+		else {
+			bloader_printf_info("Unloaded %s successfully.", module.c_str());
+		}
+	}
+	else {
+		bloader_printf_error("Could not find %s module.", module.c_str());
+	}
+}
+
+void bloader_ts_loadModule(SimObject* this_, int argc, const char* argv[]) {
+	std::string module(argv[1]);
+	if (g_engine.moduleLoaded(module) == BL_OK) {
+		bloader_ts_unloadModule(this_, argc, argv);
+	}
+
+	int err = g_engine.loadModule(module);
+	if (err != BL_OK) {
+		bloader_printf_error("Error occured while loading module: %s", bloader_getError(err));
+	}
+	else {
+		bloader_printf_info("Loaded %s successfully.", module.c_str());
+	}
+}
+
 bool bloader_init(std::shared_ptr<class TorqueEngine> torque)
 {
 	if(g_engine.init(torque)) {
 		g_engine.info("BLoader %s loaded successfully.", bloader_versionString());
+		
+		torque->ConsoleFunction(NULL, "unloadModule", bloader_ts_unloadModule, "(string moduleName) - Unload a module, replacing it's functions with blank templates.", 2, 2);
+		torque->ConsoleFunction(NULL, "loadModule", bloader_ts_loadModule, "(string moduleName) - Load a module, or reload it if it is already in.", 2, 2);
 		return true;
 	}
 	else {

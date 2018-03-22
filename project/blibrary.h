@@ -25,6 +25,8 @@ BLOADER_IMPORT int blibrary_initialize(blmodule * module);
 
 BLOADER_IMPORT void blibrary_info(blinfo * info);
 
+BLOADER_IMPORT void blibrary_deinit();
+
 #ifdef __cplusplus
 }
 #endif //__cplusplus

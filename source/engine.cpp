@@ -81,9 +81,24 @@ int Engine::unloadModule(const std::string & name)
 		return BLOADER_NO_MODULE;
 
 	auto module = it->second;
+
+	auto deinit = module->library.function(blibrary_deinit);
+	if (deinit) {
+		deinit();
+	}
+	else {
+		bloader_printf_error("could not find a deinit function");
+	}
 	// Make all functions and variables invalid
-	for (const auto & func : module->func_void)
-		torque->ConsoleFunction(func.first.c_str(), func.second.c_str(), empty_void, "", 0, 0);
+	for (const auto & func : module->func_void) {
+		const char* ns = func.first.c_str();
+		if (_stricmp(ns, "") == 0) {
+			torque->ConsoleFunction(NULL, func.second.c_str(), empty_void, "", 0, 0);
+		}
+		else {
+			torque->ConsoleFunction(ns, func.second.c_str(), empty_void, "", 0, 0);
+		}
+	}
 	for (const auto & func : module->func_bool)
 		torque->ConsoleFunction(func.first.c_str(), func.second.c_str(), empty_bool, "", 0, 0);
 	for (const auto & func : module->func_int)
@@ -185,7 +200,12 @@ void Engine::consoleFunction(blmodule * module, const char * nameSpace, const ch
 	if (!module)
 		return;
 	module->func_void.emplace(std::make_pair(nameSpace, name));
-	torque->ConsoleFunction(nameSpace, name, (VoidCallback)callback, usage, minArgs, maxArgs);
+	if (_stricmp(nameSpace, "") == 0) {
+		torque->ConsoleFunction(NULL, name, (VoidCallback)callback, usage, minArgs, maxArgs);
+	}
+	else {
+		torque->ConsoleFunction(NULL, name, (VoidCallback)callback, usage, minArgs, maxArgs);
+	}
 }
 void Engine::consoleFunction(blmodule * module, const char * nameSpace, const char * name,
 	bl_callback_bool callback, const char * usage, int minArgs, int maxArgs)
@@ -193,7 +213,12 @@ void Engine::consoleFunction(blmodule * module, const char * nameSpace, const ch
 	if (!module)
 		return;
 	module->func_void.emplace(std::make_pair(nameSpace, name));
-	torque->ConsoleFunction(nameSpace, name, (BoolCallback)callback, usage, minArgs, maxArgs);
+	if (_stricmp(nameSpace, "") == 0) {
+		torque->ConsoleFunction(NULL, name, (BoolCallback)callback, usage, minArgs, maxArgs);
+	}
+	else {
+		torque->ConsoleFunction(NULL, name, (BoolCallback)callback, usage, minArgs, maxArgs);
+	}
 }
 void Engine::consoleFunction(blmodule * module, const char * nameSpace, const char * name,
 	bl_callback_int callback, const char * usage, int minArgs, int maxArgs)
@@ -201,7 +226,12 @@ void Engine::consoleFunction(blmodule * module, const char * nameSpace, const ch
 	if (!module)
 		return;
 	module->func_void.emplace(std::make_pair(nameSpace, name));
-	torque->ConsoleFunction(nameSpace, name, (IntCallback)callback, usage, minArgs, maxArgs);
+	if (_stricmp(nameSpace, "") == 0) {
+		torque->ConsoleFunction(NULL, name, (IntCallback)callback, usage, minArgs, maxArgs);
+	}
+	else {
+		torque->ConsoleFunction(NULL, name, (IntCallback)callback, usage, minArgs, maxArgs);
+	}
 }
 void Engine::consoleFunction(blmodule * module, const char * nameSpace, const char * name,
 	bl_callback_float callback, const char * usage, int minArgs, int maxArgs)
@@ -209,7 +239,12 @@ void Engine::consoleFunction(blmodule * module, const char * nameSpace, const ch
 	if (!module)
 		return;
 	module->func_void.emplace(std::make_pair(nameSpace, name));
-	torque->ConsoleFunction(nameSpace, name, (FloatCallback)callback, usage, minArgs, maxArgs);
+	if (_stricmp(nameSpace, "") == 0) {
+		torque->ConsoleFunction(NULL, name, (FloatCallback)callback, usage, minArgs, maxArgs);
+	}
+	else {
+		torque->ConsoleFunction(NULL, name, (FloatCallback)callback, usage, minArgs, maxArgs);
+	}
 }
 void Engine::consoleFunction(blmodule * module, const char * nameSpace, const char * name,
 	bl_callback_string callback, const char * usage, int minArgs, int maxArgs)
@@ -217,7 +252,12 @@ void Engine::consoleFunction(blmodule * module, const char * nameSpace, const ch
 	if (!module)
 		return;
 	module->func_void.emplace(std::make_pair(nameSpace, name));
-	torque->ConsoleFunction(nameSpace, name, (StringCallback)callback, usage, minArgs, maxArgs);
+	if (_stricmp(nameSpace, "") == 0) {
+		torque->ConsoleFunction(NULL, name, (StringCallback)callback, usage, minArgs, maxArgs);
+	}
+	else {
+		torque->ConsoleFunction(NULL, name, (StringCallback)callback, usage, minArgs, maxArgs);
+	}
 }
 
 void Engine::consoleVariable(blmodule * module, const char * name, bool * var)
