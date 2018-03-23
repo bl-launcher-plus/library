@@ -172,12 +172,9 @@ const char * TorqueEngine::StringTableEntry(const char * str, bool caseSensitive
 	// Make sure it is allocated
 	if (!*StringTable)
 	{
-		//Since all it's really looking for is a persistent reference to a string
-		//We can just bypass the StringTable entirely and make one that's allocated on the heap and never free it
-		//Yes, this is leaking memory. 
-		char* bypassStringTable = new char(sizeof(str));
-		strcpy_s(bypassStringTable, sizeof(str), str);
-		return (const char*)bypassStringTable;
+		// Generate our own inefficient table
+		auto res = bypassStringTable.insert(str);
+		return res.first->c_str();
 	}
 	return StringTableInsert(*StringTable, str, caseSensitive);
 }

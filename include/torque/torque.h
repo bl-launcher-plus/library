@@ -7,6 +7,7 @@
 
 #include <map>
 #include <string>
+#include <set>
 
 /*
  * Torque Engine wrapper
@@ -49,6 +50,9 @@ private:
 
 	void ** StringTable = nullptr; // StringTable pointer
 	void * GlobalVars = nullptr; // global variable dictionary pointer
+
+	// If StringTable for some strange reason is not initialized, this is a backup to make stuff keep going
+	std::set<std::string> bypassStringTable;
 
 	// Namespace::addCommand overloads
 	BLFUNC(void, __thiscall, AddStringCommand, Namespace *ns, const char* name, StringCallback cb, const char *usage, int minArgs, int maxArgs);
