@@ -29,7 +29,17 @@ public:
 	int moduleLoaded(const blmodule * module) const;
 	const blinfo * const getModuleInfo(const blmodule * module) const;
 
-	// Console funcitonalities
+	// Console functionalities
+	void consoleFunction(const char * nameSpace, const char * name,
+		bl_callback_void callback, const char * usage, int minArgs, int maxArgs);
+	void consoleFunction(const char * nameSpace, const char * name,
+		bl_callback_bool callback, const char * usage, int minArgs, int maxArgs);
+	void consoleFunction(const char * nameSpace, const char * name,
+		bl_callback_int callback, const char * usage, int minArgs, int maxArgs);
+	void consoleFunction(const char * nameSpace, const char * name,
+		bl_callback_float callback, const char * usage, int minArgs, int maxArgs);
+	void consoleFunction(const char * nameSpace, const char * name,
+		bl_callback_string callback, const char * usage, int minArgs, int maxArgs);
 	void consoleFunction(blmodule * module, const char * nameSpace, const char * name,
 		bl_callback_void callback, const char * usage, int minArgs, int maxArgs);
 	void consoleFunction(blmodule * module, const char * nameSpace, const char * name,
