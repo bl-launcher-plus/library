@@ -24,7 +24,7 @@ Get modules information through `bloader_module_*`.
 
 
 [bloader.h]: https://github.com/bl-launcher-plus/library/blob/master/include/bloader.h
-[bloader.h]: https://github.com/bl-launcher-plus/library/blob/master/include/bloader.hpp
+[bloader.hpp]: https://github.com/bl-launcher-plus/library/blob/master/include/bloader.hpp
 [blibrary.h]: https://github.com/bl-launcher-plus/library/blob/master/project/blibrary.h
 [launcher]: https://github.com/bl-launcher-plus/launcher
 [Blockland EULA]: https://blockland.us/staticPages/EULA.txt
