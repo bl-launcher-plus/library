@@ -69,8 +69,8 @@ bool TorqueEngine::init()
 	BLSCAN(GetGlobalVariable, "\x56\x8b\x74\x24\x08\x85\xf6\x74\x00\x8a\x06\x84\xc0\x75", "xxxxxxxx?xxxxx");
 	BLSCAN(SetGlobalVariable, "\x56\x8b\x74\x24\x08\x80\x3e\x24\x8b\xc6\x74\x00\x56\xe8", "xxxxxxxxxxx?xx");
 
-	// since it's so small we need a long sig
-	// The string table is used in lookupnamespace so we can get it's location
+	// Since it's so small we need a long sig
+	// The string table is used in lookupnamespace so we can get its location
 	// Note: Due to that it may be allocated later on, we will only retrieve the address to the variable storing the object
 	StringTable = (void **)(*(DWORD**)((DWORD)LookupNamespace + 15));
 

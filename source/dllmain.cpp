@@ -26,7 +26,8 @@ void Sim__init_hook(void)
 }
 
 // DLL is unloaded
-bool dll_unload() {
+bool dll_unload()
+{
 	delete Sim__init_detour;
 	return bloader_destroy();
 }

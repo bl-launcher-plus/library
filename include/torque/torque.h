@@ -28,10 +28,10 @@ public:
 	void ConsoleFunction(const char * scope, const char * name, VoidCallback callBack, const char * usage, int minArgs, int maxArgs);
 	void ConsoleFunction(const char * scope, const char * name, BoolCallback callBack, const char * usage, int minArgs, int maxArgs);
 
-	void ConsoleVariable(const char *name, int *data);
-	void ConsoleVariable(const char *name, bool *data);
-	void ConsoleVariable(const char *name, float *data);
-	void ConsoleVariable(const char *name, char *data);
+	void ConsoleVariable(const char * name, int * data);
+	void ConsoleVariable(const char * name, bool * data);
+	void ConsoleVariable(const char * name, float * data);
+	void ConsoleVariable(const char * name, char * data);
 
 	// Evaluate a torquescript string in global scope
 	const char * Eval(const char * str);

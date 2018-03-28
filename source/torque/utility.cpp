@@ -3,6 +3,7 @@
 #include <windows.h>
 #include <stdarg.h>
 
+// THIS SHOULD NEVER HAPPEN
 void TorqueEngine::rewrite__fatal() {
 	Printf("!!! THIS SHOULD NEVER HAPPEN !!!");
 }
@@ -11,27 +12,28 @@ Namespace::Entry* TorqueEngine::passThroughLookup(Namespace* ns, const char* nam
 	Namespace::Entry* entry;
 	std::map<std::string, Namespace::Entry*>::iterator it;
 
-	std::string lol(ns->mName);
-	lol.append("__");
-	lol.append(name);
-	//Identifier* lol = new Identifier();
-	it = cache.find(lol); //Look into our Namespace::Entry* cache..
+	std::string strNamespace(ns->mName);
+	strNamespace.append("__");
+	strNamespace.append(name);
+	// Look into our Namespace::Entry* cache..
+	it = cache.find(strNamespace);
 	if (it != cache.end()) {
 		entry = it->second;
 		if (entry == nullptr) {
 			rewrite__fatal();
 			Printf("Fatal: found nullptr in cache!");
-			cache.erase(it); //Erase it so we don't encounter it again.
+			// Erase it so we don't encounter it again.
+			cache.erase(it);
 			return nullptr;
 		}
 	}
 	else {
 		entry = Namespace__lookup(ns, name);
 		if (entry == nullptr) {
-			//Printf("Could not find function.");
 			return nullptr;
 		}
-		cache.insert(cache.end(), std::make_pair(lol, entry)); //Insert it so further calls are optimized.
+		// Insert it so further calls are optimized.
+		cache.insert(cache.end(), std::make_pair(strNamespace, entry));
 	}
 	return entry;
 }
@@ -40,7 +42,8 @@ Namespace::Entry* TorqueEngine::fastLookup(const char* ourNamespace, const char*
 	Namespace* ns;
 	Namespace::Entry* entry;
 
-	if (_stricmp(ourNamespace, "") == 0) { //If the namespace is blank, assume we're looking in the global namespace.
+	// If the namespace is blank, assume we're looking in the global namespace.
+	if (_stricmp(ourNamespace, "") == 0) {
 		if (GlobalNS == nullptr) {
 			GlobalNS = LookupNamespace(nullptr);
 		}
@@ -52,10 +55,9 @@ Namespace::Entry* TorqueEngine::fastLookup(const char* ourNamespace, const char*
 		if (its != nscache.end()) {
 			ns = its->second;
 			if (ns == nullptr) {
-				//Somehow it got nullptr'd..
+				// Somehow it got nullptr'd..
 				ns = LookupNamespace(ourNamespace);
 				if (ns == nullptr) {
-					//THIS SHOULD NEVER HAPPEN!
 					rewrite__fatal();
 					Printf("Fatal: Found cached NS entry with nullptr, could not find namespace!");
 					nscache.erase(its);
@@ -77,26 +79,28 @@ Namespace::Entry* TorqueEngine::fastLookup(const char* ourNamespace, const char*
 	}
 
 	std::map<std::string, Namespace::Entry*>::iterator it;
-	std::string lol(ourNamespace);
-	lol.append("__");
-	lol.append(name);
-	it = cache.find(lol); //Look into our Namespace::Entry* cache..
+	std::string strNamespace(ourNamespace);
+	strNamespace.append("__");
+	strNamespace.append(name);
+	// Look into our Namespace::Entry* cache..
+	it = cache.find(strNamespace);
 	if (it != cache.end()) {
 		entry = it->second;
 		if (entry == nullptr) {
 			rewrite__fatal();
 			Printf("Fatal: found nullptr in cache!");
-			cache.erase(it); //Erase it so we don't encounter it again.
+			// Erase it so we don't encounter it again.
+			cache.erase(it);
 			return nullptr;
 		}
 	}
 	else {
 		entry = Namespace__lookup(ns, StringTableEntry(name));
 		if (entry == nullptr) {
-			//Printf("Could not find function.");
 			return nullptr;
 		}
-		cache.insert(cache.end(), std::make_pair(lol, entry)); //Insert it so further calls are optimized.
+		// Insert it so further calls are optimized.
+		cache.insert(cache.end(), std::make_pair(strNamespace, entry));
 	}
 
 	return entry;
@@ -127,7 +131,8 @@ void* TorqueEngine::ts__fastCall(Namespace::Entry* ourCall, SimObject* obj, unsi
 				ourCall->mNamespace, ourCall->mFunctionName,
 				argc, argv, false, ourCall->mNamespace->mPackage,
 				0);
-			return (void*)retVal; //we know what it's supposed to return.
+			// We know what it's supposed to return.
+			return (void*)retVal;
 		}
 		else {
 			return nullptr;
@@ -152,7 +157,7 @@ void* TorqueEngine::ts__fastCall(Namespace::Entry* ourCall, SimObject* obj, unsi
 	case Namespace::Entry::IntCallbackType:
 		return (void*)ourCall->cb.mIntCallbackFunc(actualObj, argc, argv);
 	case Namespace::Entry::FloatCallbackType: {
-		//Wtf?
+		// Wtf?
 		// TODO: Figure out why this is a thing and how to fix it
 		float ourret[] = { ourCall->cb.mFloatCallbackFunc(actualObj, argc, argv) };
 		return (void*)ourret;
@@ -179,67 +184,67 @@ const char * TorqueEngine::StringTableEntry(const char * str, bool caseSensitive
 	return StringTableInsert(*StringTable, str, caseSensitive);
 }
 
-//Register a torquescript function that returns a string. The function must look like this:
-//const char* func(DWORD* obj, int argc, const char* argv[])
-void TorqueEngine::ConsoleFunction(const char* nameSpace, const char* name, StringCallback callBack, const char* usage, int minArgs, int maxArgs)
+// Register a torquescript function that returns a string. The function must look like this:
+// const char* func(DWORD* obj, int argc, const char* argv[])
+void TorqueEngine::ConsoleFunction(const char * nameSpace, const char * name, StringCallback callBack, const char * usage, int minArgs, int maxArgs)
 {
 	AddStringCommand(LookupNamespace(nameSpace), StringTableEntry(name, false), callBack, usage, minArgs, maxArgs);
 }
 
-//Register a torquescript function that returns an int. The function must look like this:
-//int func(DWORD* obj, int argc, const char* argv[])
-void TorqueEngine::ConsoleFunction(const char* nameSpace, const char* name, IntCallback callBack, const char* usage, int minArgs, int maxArgs)
+// Register a torquescript function that returns an int. The function must look like this:
+// int func(DWORD* obj, int argc, const char* argv[])
+void TorqueEngine::ConsoleFunction(const char * nameSpace, const char * name, IntCallback callBack, const char * usage, int minArgs, int maxArgs)
 {
 	AddIntCommand(LookupNamespace(nameSpace), StringTableEntry(name, false), callBack, usage, minArgs, maxArgs);
 }
 
-//Register a torquescript function that returns a float. The function must look like this:
-//float func(DWORD* obj, int argc, const char* argv[])
-void TorqueEngine::ConsoleFunction(const char* nameSpace, const char* name, FloatCallback callBack, const char* usage, int minArgs, int maxArgs)
+// Register a torquescript function that returns a float. The function must look like this:
+// float func(DWORD* obj, int argc, const char* argv[])
+void TorqueEngine::ConsoleFunction(const char * nameSpace, const char * name, FloatCallback callBack, const char * usage, int minArgs, int maxArgs)
 {
 	AddFloatCommand(LookupNamespace(nameSpace), StringTableEntry(name, false), callBack, usage, minArgs, maxArgs);
 }
 
-//Register a torquescript function that returns nothing. The function must look like this:
-//void func(DWORD* obj, int argc, const char* argv[])
-void TorqueEngine::ConsoleFunction(const char* nameSpace, const char* name, VoidCallback callBack, const char* usage, int minArgs, int maxArgs)
+// Register a torquescript function that returns nothing. The function must look like this:
+// void func(DWORD* obj, int argc, const char* argv[])
+void TorqueEngine::ConsoleFunction(const char * nameSpace, const char * name, VoidCallback callBack, const char * usage, int minArgs, int maxArgs)
 {
 	AddVoidCommand(LookupNamespace(nameSpace), StringTableEntry(name, false), callBack, usage, minArgs, maxArgs);
 }
 
-//Register a torquescript function that returns a bool. The function must look like this:
-//bool func(DWORD* obj, int argc, const char* argv[])
-void TorqueEngine::ConsoleFunction(const char* nameSpace, const char* name, BoolCallback callBack, const char* usage, int minArgs, int maxArgs)
+// Register a torquescript function that returns a bool. The function must look like this:
+// bool func(DWORD* obj, int argc, const char* argv[])
+void TorqueEngine::ConsoleFunction(const char * nameSpace, const char * name, BoolCallback callBack, const char * usage, int minArgs, int maxArgs)
 {
 	AddBoolCommand(LookupNamespace(nameSpace), StringTableEntry(name, false), callBack, usage, minArgs, maxArgs);
 }
 
-//Expose an integer variable to torquescript
-void TorqueEngine::ConsoleVariable(const char* name, int* data)
+// Expose an integer variable to torquescript
+void TorqueEngine::ConsoleVariable(const char * name, int * data)
 {
 	AddVariable(GlobalVars, name, 4, data);
 }
 
-//Expose a boolean variable to torquescript
-void TorqueEngine::ConsoleVariable(const char* name, bool* data)
+// Expose a boolean variable to torquescript
+void TorqueEngine::ConsoleVariable(const char * name, bool * data)
 {
 	AddVariable(GlobalVars, name, 6, data);
 }
 
-//Expose a float variable to torquescript
-void TorqueEngine::ConsoleVariable(const char* name, float* data)
+// Expose a float variable to torquescript
+void TorqueEngine::ConsoleVariable(const char * name, float * data)
 {
 	AddVariable(GlobalVars, name, 8, data);
 }
 
-//Expose a string variable to torquescript
-void TorqueEngine::ConsoleVariable(const char* name, char* data)
+// Expose a string variable to torquescript
+void TorqueEngine::ConsoleVariable(const char * name, char * data)
 {
 	AddVariable(GlobalVars, name, 10, data);
 }
 
-//Evaluate a torquescript string in global scope
-const char* TorqueEngine::Eval(const char* str)
+// Evaluate a torquescript string in global scope
+const char* TorqueEngine::Eval(const char * str)
 {
 	return Evaluate(str, false, nullptr);
 }
