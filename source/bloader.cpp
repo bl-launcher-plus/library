@@ -1,4 +1,5 @@
 #include "bloader.h"
+#include "blibrary.h"
 #include "engine.h"
 #include <stdarg.h>
 #include <memory>
@@ -7,8 +8,11 @@ Engine g_engine;
 
 
 // Engine modification declarations
-void bloader_ts_unloadModule(void* this_, int argc, const char* argv[]);
-void bloader_ts_loadModule(void* this_, int argc, const char* argv[]);
+void bloader_ts_unloadModule(void * this_, int argc, const char * argv[]);
+void bloader_ts_loadModule(void * this_, int argc, const char * argv[]);
+const char * bloader_ts_getModuleName(void * this_, int argc, const char * argv[]);
+int bloader_ts_getModuleVersion(void * this_, int argc, const char * argv[]);
+const char * bloader_ts_getModuleDescription(void * this_, int argc, const char * argv[]);
 
 // Initializating engine
 bool bloader_init(std::shared_ptr<class TorqueEngine> torque)
@@ -20,6 +24,9 @@ bool bloader_init(std::shared_ptr<class TorqueEngine> torque)
 		// Define TS methods
 		g_engine.consoleFunction(nullptr, "unloadModule", bloader_ts_unloadModule, "(string moduleName) - Unload a module, replacing it's functions with blank templates.", 2, 2);
 		g_engine.consoleFunction(nullptr, "loadModule", bloader_ts_loadModule, "(string moduleName) - Load a module, or reload it if it is already in.", 2, 2);
+		g_engine.consoleFunction(nullptr, "getModuleName", bloader_ts_getModuleName, "(string moduleName) - Get a module name.", 2, 2);
+		g_engine.consoleFunction(nullptr, "getModuleVersion", bloader_ts_getModuleVersion, "(string moduleName) - Get a module version.", 2, 2);
+		g_engine.consoleFunction(nullptr, "getModuleDescription", bloader_ts_getModuleDescription, "(string moduleName) - Get a module description.", 2, 2);
 		return true;
 	}
 	else
@@ -230,7 +237,7 @@ void * bloader_symbol(const blmodule * module, const char * func)
  * Engine modification definitions
  */
 
-void bloader_ts_unloadModule(void* this_, int argc, const char* argv[])
+void bloader_ts_unloadModule(void * this_, int argc, const char * argv[])
 {
 	std::string name(argv[1]);
 	if (g_engine.moduleLoaded(name) == BL_OK)
@@ -245,7 +252,7 @@ void bloader_ts_unloadModule(void* this_, int argc, const char* argv[])
 		bloader_printf_error("Could not find %s module.", name.c_str());
 }
 
-void bloader_ts_loadModule(void* this_, int argc, const char* argv[])
+void bloader_ts_loadModule(void * this_, int argc, const char * argv[])
 {
 	std::string name(argv[1]);
 	if (g_engine.moduleLoaded(name) == BL_OK)
@@ -256,4 +263,31 @@ void bloader_ts_loadModule(void* this_, int argc, const char* argv[])
 		bloader_printf_error("Error occured while loading module: %s", bloader_getError(err));
 	else
 		bloader_printf_info("Loaded %s successfully.", name.c_str());
+}
+
+const char * bloader_ts_getModuleName(void * this_, int argc, const char * argv[])
+{
+	auto module = g_engine.getModule(argv[1]);
+	if (!module)
+		return "";
+	auto info = g_engine.getModuleInfo(module);
+	return info->name;
+}
+
+int bloader_ts_getModuleVersion(void * this_, int argc, const char * argv[])
+{
+	auto module = g_engine.getModule(argv[1]);
+	if (!module)
+		return -1;
+	auto info = g_engine.getModuleInfo(module);
+	return info->version;
+}
+
+const char * bloader_ts_getModuleDescription(void * this_, int argc, const char * argv[])
+{
+	auto module = g_engine.getModule(argv[1]);
+	if (!module)
+		return "";
+	auto info = g_engine.getModuleInfo(module);
+	return info->description;
 }
