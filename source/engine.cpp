@@ -218,7 +218,7 @@ void Engine::consoleFunction(blmodule * module, const char * nameSpace, const ch
 {
 	if (!module)
 		return;
-	module->func_void.emplace(std::make_pair(nameSpace, name));
+	module->func_void.emplace(std::make_pair(nameSpace ? nameSpace : "", name));
 	consoleFunction(nameSpace, name, callback, usage, minArgs, maxArgs);
 }
 void Engine::consoleFunction(blmodule * module, const char * nameSpace, const char * name,
@@ -226,7 +226,7 @@ void Engine::consoleFunction(blmodule * module, const char * nameSpace, const ch
 {
 	if (!module)
 		return;
-	module->func_void.emplace(std::make_pair(nameSpace, name));
+	module->func_void.emplace(std::make_pair(nameSpace ? nameSpace : "", name));
 	consoleFunction(nameSpace, name, callback, usage, minArgs, maxArgs);
 }
 void Engine::consoleFunction(blmodule * module, const char * nameSpace, const char * name,
@@ -234,7 +234,7 @@ void Engine::consoleFunction(blmodule * module, const char * nameSpace, const ch
 {
 	if (!module)
 		return;
-	module->func_void.emplace(std::make_pair(nameSpace, name));
+	module->func_void.emplace(std::make_pair(nameSpace ? nameSpace : "", name));
 	consoleFunction(nameSpace, name, callback, usage, minArgs, maxArgs);
 }
 void Engine::consoleFunction(blmodule * module, const char * nameSpace, const char * name,
@@ -242,7 +242,7 @@ void Engine::consoleFunction(blmodule * module, const char * nameSpace, const ch
 {
 	if (!module)
 		return;
-	module->func_void.emplace(std::make_pair(nameSpace, name));
+	module->func_void.emplace(std::make_pair(nameSpace ? nameSpace : "", name));
 	consoleFunction(nameSpace, name, callback, usage, minArgs, maxArgs);
 }
 void Engine::consoleFunction(blmodule * module, const char * nameSpace, const char * name,
@@ -250,7 +250,7 @@ void Engine::consoleFunction(blmodule * module, const char * nameSpace, const ch
 {
 	if (!module)
 		return;
-	module->func_void.emplace(std::make_pair(nameSpace, name));
+	module->func_void.emplace(std::make_pair(nameSpace ? nameSpace : "", name));
 	consoleFunction(nameSpace, name, callback, usage, minArgs, maxArgs);
 }
 
